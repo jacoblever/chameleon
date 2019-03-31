@@ -12,7 +12,7 @@ namespace ChameleonFunction.Tests
             var context = new TestLambdaContext();
             var upperCase = function.FunctionHandler("Hello World", context);
 
-            Assert.Equal("HELLO WORLD", upperCase);
+            Assert.Equal("HELLO WORLD YES", upperCase);
         }
     }
 }

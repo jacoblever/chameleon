@@ -7,7 +7,6 @@ test_steps: &test_steps
     - checkout
     - run: find .
     - run: dotnet restore
-    - run: dotnet build
     - run: dotnet test
 
 deploy_steps: &deploy_steps
@@ -18,8 +17,7 @@ deploy_steps: &deploy_steps
     - run: find .
     - run: apt update && apt -y install zip
     - run: dotnet tool install --global Amazon.Lambda.Tools
-    - run: mkdir ~/.aws 
-    - run: echo -e "[default]\naws_access_key_id=$AWS_ACCESS_KEY_ID_PROD\naws_secret_access_key=$AWS_SECRET_ACCESS_KEY_PROD\n" > ~/.aws/credentials
+    - run: mkdir ~/.aws && echo -e "[default]\naws_access_key_id=$AWS_ACCESS_KEY_ID_PROD\naws_secret_access_key=$AWS_SECRET_ACCESS_KEY_PROD\n" > ~/.aws/credentials
     - run: cd ./src/ChameleonFunction/ && /root/.dotnet/tools/dotnet-lambda deploy-function ChameleonFunction --region "eu-west-1"
 
 jobs:

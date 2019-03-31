@@ -10,7 +10,7 @@ namespace ChameleonFunction
         public string FunctionHandler(string input, ILambdaContext context)
         {
             var value = input?.ToUpper();
-            return value;
-        }
+            return value + " YES";
+        }   
     }
 }
