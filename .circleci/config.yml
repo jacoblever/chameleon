@@ -1,12 +1,42 @@
 version: 2
+
+test_steps: &test_steps
+  docker:
+    - image: mcr.microsoft.com/dotnet/core/sdk:2.1
+  steps:
+    - checkout
+    - run: find .
+    - run: dotnet restore
+    - run: dotnet build
+    - run: dotnet test
+
+deploy_steps: &deploy_steps
+  docker:
+    - image: mcr.microsoft.com/dotnet/core/sdk:2.1
+  steps:
+    - checkout
+    - run: find .
+    - run: apt update && apt -y install zip
+    - run: dotnet tool install --global Amazon.Lambda.Tools
+    - run: mkdir ~/.aws 
+    - run: echo -e "[default]\naws_access_key_id=$AWS_ACCESS_KEY_ID_PROD\naws_secret_access_key=$AWS_SECRET_ACCESS_KEY_PROD\n" > ~/.aws/credentials
+    - run: cd ./src/ChameleonFunction/ && /root/.dotnet/tools/dotnet-lambda deploy-function ChameleonFunction --region "eu-west-1"
+
 jobs:
-  build:
-    docker:
-      - image: mcr.microsoft.com/dotnet/core/sdk:2.1
-    working_directory: /test/ChameleonFunction.Test
-    steps:
-      - checkout
-      - run: find .
-      - run: dotnet restore
-      - run: dotnet build
-      - run: dotnet test
+  run_tests:
+    <<: *test_steps
+  deploy:
+    <<: *deploy_steps
+
+workflows:
+  version: 2
+  test_and_deploy:
+    jobs:
+      - run_tests
+      - deploy:
+          requires:
+            - run_tests
+          filters:
+            branches:
+              only:
+                - master
