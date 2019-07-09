@@ -10,9 +10,15 @@ namespace ChameleonFunction.Tests
         {
             var function = new Function();
             var context = new TestLambdaContext();
-            var upperCase = function.FunctionHandler("Hello World", context);
+            var result = function.FunctionHandler("ABCD", context);
 
-            Assert.Equal("HELLO WORLD YES", upperCase);
+            var expected = new RoomStatus(
+                code: "ABCD",
+                peopleCount: 4,
+                chameleonCount: 2,
+                state: RoomState.InGame,
+                character: "butterfly");
+            Assert.Equal(expected, result);
         }
     }
 }

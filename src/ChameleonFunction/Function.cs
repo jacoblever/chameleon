@@ -7,10 +7,15 @@ namespace ChameleonFunction
 {
     public class Function
     {
-        public string FunctionHandler(string input, ILambdaContext context)
+        public RoomStatus FunctionHandler(string input, ILambdaContext context)
         {
             var value = input?.ToUpper();
-            return value + " YES";
+            return new RoomStatus(
+                code: value,
+                peopleCount: 4,
+                chameleonCount: 2,
+                state: RoomState.InGame,
+                character: "butterfly");
         }   
     }
 }
