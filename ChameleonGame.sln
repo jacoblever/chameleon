@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChameleonLeaveRoomFunction"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChameleonStartGameFunction", "src\ChameleonStartGameFunction\ChameleonStartGameFunction.csproj", "{AF0817F5-4E27-4E0C-AB20-8DE219A3EF90}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataStore", "src\DataStore\DataStore.csproj", "{020582CB-5756-4EE5-9FDC-06F0C632DA34}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataStore.Tests", "test\DataStore.Tests\DataStore.Tests.csproj", "{D81AFEBD-E0E5-4B88-BB28-6BA38497B74D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,5 +47,13 @@ Global
 		{AF0817F5-4E27-4E0C-AB20-8DE219A3EF90}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF0817F5-4E27-4E0C-AB20-8DE219A3EF90}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF0817F5-4E27-4E0C-AB20-8DE219A3EF90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{020582CB-5756-4EE5-9FDC-06F0C632DA34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{020582CB-5756-4EE5-9FDC-06F0C632DA34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{020582CB-5756-4EE5-9FDC-06F0C632DA34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{020582CB-5756-4EE5-9FDC-06F0C632DA34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D81AFEBD-E0E5-4B88-BB28-6BA38497B74D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D81AFEBD-E0E5-4B88-BB28-6BA38497B74D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D81AFEBD-E0E5-4B88-BB28-6BA38497B74D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D81AFEBD-E0E5-4B88-BB28-6BA38497B74D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
