@@ -24,17 +24,38 @@ deploy_steps: &deploy_steps
     - run: cd ./src/ChameleonLeaveRoomFunction/ && /root/.dotnet/tools/dotnet-lambda deploy-function ChameleonLeaveRoomFunction --region "eu-west-1"
     - run: cd ./src/ChameleonStartGameFunction/ && /root/.dotnet/tools/dotnet-lambda deploy-function ChameleonStartGameFunction --region "eu-west-1"
 
+webapp_test_steps: &webapp_test_steps
+  docker:
+    - image: docker:stable-git
+  steps:
+    - checkout
+    - setup_remote_docker:
+        docker_layer_caching: true
+        reusable: true
+        version: 17.11.0-ce
+    - run:
+        name: Build application Docker image
+        command: |
+          cd ./chameleon-webapp && docker build -t chameleon-webapp .
+    - run:
+        name: Run tests
+        command: |
+          cd ./chameleon-webapp && docker run --env CI=true chameleon-webapp npm test
+
 jobs:
   run_tests:
     <<: *test_steps
   deploy:
     <<: *deploy_steps
+  run_webapp_test:
+    <<: *webapp_test_steps
 
 workflows:
   version: 2
   test_and_deploy:
     jobs:
       - run_tests
+      - run_webapp_test
       - deploy:
           requires:
             - run_tests
