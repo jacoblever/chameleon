@@ -1,5 +1,4 @@
 using Amazon.Lambda.Core;
-using DataStore;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -8,12 +7,15 @@ namespace ChameleonJoinRoomFunction
 {
     public class Function
     {
-        public Person FunctionHandler(string input, ILambdaContext context)
+        public Person FunctionHandler(JoinRoomRequest input, ILambdaContext context)
         {
-            var value = input?.ToUpper();
-            var a = Client.TestSave();
-            return new Person(roomCode: a, personId: "Person1");
+            return new Person(roomCode: input.RoomCode, personId: "Person1");
         }
+    }
+
+    public class JoinRoomRequest
+    {
+        public string RoomCode { get; set; }
     }
 
     public class Person
