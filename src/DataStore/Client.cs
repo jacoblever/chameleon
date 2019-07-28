@@ -54,7 +54,7 @@ namespace DataStore
             }
         }
 
-        private static Room GetRoom(string roomCode)
+        public static Room GetRoom(string roomCode)
         {
             var client = CreateClient();
             var table = Table.LoadTable(client, "ChameleonData");

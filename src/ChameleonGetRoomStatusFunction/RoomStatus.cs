@@ -4,7 +4,7 @@ namespace ChameleonGetRoomStatusFunction
 {
     public class RoomStatus
     {
-        public RoomStatus(string code, int peopleCount, int chameleonCount, RoomState state, string character)
+        public RoomStatus(string code, int peopleCount, int chameleonCount, string state, string character)
         {
             Code = code;
             PeopleCount = peopleCount;
@@ -17,7 +17,7 @@ namespace ChameleonGetRoomStatusFunction
         public string Code { get; }
         public int PeopleCount { get; }
         public int ChameleonCount { get; }
-        public RoomState State { get; }
+        public string State { get; }
         public string Character { get; }
         public int TimeToPollMillisecond { get; }
 
