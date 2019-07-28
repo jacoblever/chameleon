@@ -15,7 +15,7 @@ namespace ChameleonGetRoomStatusFunction
                 peopleCount: 4,
                 chameleonCount: 2,
                 state: RoomState.InGame,
-                character: Client.TestGet());
+                character: "");
         }
     }
 }

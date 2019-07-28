@@ -13,7 +13,7 @@ class JoinRoomComponent extends React.Component {
   }
 
   createRoom(e) {
-    this.makeJoinRoomRequest("");
+    this.makeJoinRoomRequest(null);
   }
 
   joinRoom(e) {
