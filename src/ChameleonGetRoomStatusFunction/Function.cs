@@ -15,7 +15,7 @@ namespace ChameleonGetRoomStatusFunction
         public APIGatewayProxyResponse FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
         {
             var roomCode = request.QueryStringParameters["RoomCode"];
-            var personId = request.Headers["X-Chameleon-PersonId"];
+            var personId = request.Headers["x-chameleon-personid"];
             var room = Client.GetRoom(roomCode);
 
             if(!room.PersonIds.Contains(personId))
