@@ -4,6 +4,7 @@ using DataStore;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System;
+using System.Linq;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -29,12 +30,14 @@ namespace ChameleonGetRoomStatusFunction
             }
 
             var peopleCount = room.PersonIds.Count;
+            var myCharacter = room.GetCharacterFor(personId);
+
             var status = new RoomStatus(
                 code: roomCode,
                 peopleCount: peopleCount,
                 chameleonCount: GetChameleonCount(peopleCount),
-                state: RoomState.PreGame.ToString(),
-                character: "");
+                state: myCharacter == null ? RoomState.PreGame.ToString() : RoomState.InGame.ToString(),
+                character: myCharacter);
 
             return new APIGatewayProxyResponse
             {

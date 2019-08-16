@@ -25,7 +25,7 @@ namespace DataStore
         {
             var room = GetRoom(roomCode);
             var personId = Guid.NewGuid().ToString();
-            room.PersonIds.Add(personId);
+            room.AddPerson(personId);
             SaveRoom(room);
             return personId;
         }
@@ -52,6 +52,16 @@ namespace DataStore
             {
                 return ex.Message;
             }
+        }
+
+        public static void StartGame(string roomCode)
+        {
+            var room = GetRoom(roomCode);
+            foreach (var personId in room.PersonIds)
+            {
+                room.SetCharacter(personId, "Pizza");
+            }
+            SaveRoom(room);
         }
 
         public static Room GetRoom(string roomCode)
