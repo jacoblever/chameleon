@@ -6,9 +6,12 @@ class InRoomComponent extends React.Component {
     this.state = {
       numberOfPeopleInRoom: null,
       numberOfChameleonsInRoom: null,
+      roomState: null,
+      character: null,
     };
 
     this.poll = this.poll.bind(this);
+    this.startGame = this.startGame.bind(this);
 
     this.poll();
   }
@@ -26,6 +29,8 @@ class InRoomComponent extends React.Component {
         this.setState({
           numberOfPeopleInRoom: jsonBody.PeopleCount,
           numberOfChameleonsInRoom: jsonBody.ChameleonCount,
+          roomState: jsonBody.State,
+          character: jsonBody.Character,
         });
         if (jsonBody.TimeToPollMillisecond) {
           setTimeout(this.poll, jsonBody.TimeToPollMillisecond);
@@ -33,16 +38,38 @@ class InRoomComponent extends React.Component {
       })
       .catch((error) => { console.error(error); })
   }
+
+  startGame(e) {
+    fetch(process.env.REACT_APP_CHAMELEON_BACKEND_BASE_URL + '/api/start-game/?RoomCode=' + this.props.roomCode, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'X-Chameleon-PersonId': this.props.personId,
+      }
+    })
+  }
   
   render() {
     return (
       <div>
         Welcome {this.props.personId} to room {this.props.roomCode}.
         <br />
-        {this.state.numberOfPeopleInRoom == null ? (
-          <span>Loading...</span>
+        {this.state.roomState === null ? (
+          <div>Loading...</div>
         ) : (
-          <span>There are {this.state.numberOfPeopleInRoom} people in the room, {this.state.numberOfChameleonsInRoom} of them are Chameleons!</span>
+          <div>
+            <div>There are {this.state.numberOfPeopleInRoom} people in the room, {this.state.numberOfChameleonsInRoom} of them are Chameleons!</div>
+            {this.state.roomState === "PreGame" ? (
+              <div>
+                <button onClick={this.startGame}>Start Game</button>
+              </div>
+            ) : (
+              <div>
+                <div>The word is {this.state.character}</div>
+                <button onClick={this.startGame}>Start New Game</button>
+              </div>
+            )}
+          </div>
         )}
       </div>
     );
