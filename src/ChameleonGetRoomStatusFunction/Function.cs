@@ -24,7 +24,7 @@ namespace ChameleonGetRoomStatusFunction
                 return new APIGatewayProxyResponse
                 {
                     StatusCode = 403,
-                    Body = $"Person {personId} not in room {roomCode}",
+                    Body = $"Person {personId} not in room {roomCode}, people in room {string.Join(',', room.PersonIds)}",
                     Headers = new Dictionary<string, string>{},
                 };
             }
