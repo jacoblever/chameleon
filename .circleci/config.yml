@@ -30,7 +30,6 @@ webapp_test_steps: &webapp_test_steps
   steps:
     - checkout
     - setup_remote_docker:
-        docker_layer_caching: true
         reusable: true
         version: 17.11.0-ce
     - run:
@@ -53,7 +52,6 @@ webapp_push_to_s3_steps: &webapp_push_to_s3_steps
   steps:
     - checkout
     - setup_remote_docker:
-        docker_layer_caching: true
         reusable: true
         version: 17.11.0-ce
     - run:
