@@ -42,7 +42,7 @@ namespace DataStore
             {
                 var client = CreateClient();
                 var table = Table.LoadTable(client, "ChameleonData");
-                var roomJson = JsonConvert.SerializeObject(room);
+                var roomJson = JsonConvert.SerializeObject(room.GetDynamoModel());
                 Document doc = Document.FromJson(roomJson);
                 Task putItem = table.PutItemAsync(doc);
                 putItem.Wait();
@@ -72,8 +72,8 @@ namespace DataStore
             getTask.Wait();
             var doc = getTask.Result;
             var roomJson = doc.ToJson();
-            var room = JsonConvert.DeserializeObject<Room>(roomJson);
-            return room;
+            var dynamoModel = JsonConvert.DeserializeObject<Room.DynamoModel>(roomJson);
+            return new Room(dynamoModel);
         }
 
         private static AmazonDynamoDBClient CreateClient()
