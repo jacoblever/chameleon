@@ -10,6 +10,6 @@
     <PackageReference Include="Amazon.Lambda.APIGatewayEvents" Version="1.2.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DataStore\DataStore.csproj" />
+    <ProjectReference Include="..\GameLogic\GameLogic.csproj" />
   </ItemGroup>
 </Project>
