@@ -55,8 +55,8 @@ namespace DataStore
 
         internal class DynamoModel
         {
-            internal Dictionary<string, string> CharacterByPersonId { get; set; } = new Dictionary<string, string>();
-            internal string RoomCode { get; set; }
+            public Dictionary<string, string> CharacterByPersonId { get; set; } = new Dictionary<string, string>();
+            public string RoomCode { get; set; }
         }
     }
 }
