@@ -1,21 +1,19 @@
 using System;
-using System.Threading.Tasks;
-using Amazon.DynamoDBv2.DocumentModel;
-using Newtonsoft.Json;
+using System.Linq;
 
 namespace DataStore
 {
     public class RoomStore : IRoomStore
     {
-        private readonly DynamoTable _dynamoTable;
+        private readonly IDynamoTable _dynamoTable;
 
         // TODO: Move this to some dependency manager
-        public static IRoomStore Create(DynamoTable dynamoTable = null)
+        public static IRoomStore Create(IDynamoTable dynamoTable = null)
         {
             return new RoomStore(dynamoTable);
         }
         
-        private RoomStore(DynamoTable dynamoTable = null)
+        private RoomStore(IDynamoTable dynamoTable = null)
         {
             _dynamoTable = dynamoTable ?? new DynamoTable();
         }
@@ -27,7 +25,7 @@ namespace DataStore
             {
                 RoomCode = roomCode
             };
-            SaveRoom(room);
+            _dynamoTable.SaveRoom(room);
             return room;
         }
 
@@ -42,43 +40,23 @@ namespace DataStore
             var room = GetRoom(roomCode);
             var personId = Guid.NewGuid().ToString();
             room.AddPerson(personId);
-            SaveRoom(room);
+            _dynamoTable.SaveRoom(room);
             return personId;
         }
 
         public void StartGame(string roomCode)
         {
             var room = GetRoom(roomCode);
-            foreach (var personId in room.PersonIds)
+            foreach (var personId in room.PersonIds.Select(x => x).ToList())
             {
                 room.SetCharacter(personId, "Pizza");
             }
-            SaveRoom(room);
+            _dynamoTable.SaveRoom(room);
         }
 
         public Room GetRoom(string roomCode)
         {
-            var table = _dynamoTable.GetTable();
-            var getTask = table.GetItemAsync(roomCode);
-            getTask.Wait();
-            var doc = getTask.Result;
-            if (doc == null)
-            {
-                return null;
-            }
-            var roomJson = doc.ToJson();
-            var dynamoModel = JsonConvert.DeserializeObject<Room.DynamoModel>(roomJson);
-            return new Room(dynamoModel);
-        }
-        
-        private string SaveRoom(Room room)
-        {
-            var table = _dynamoTable.GetTable();
-            var roomJson = JsonConvert.SerializeObject(room.GetDynamoModel());
-            Document doc = Document.FromJson(roomJson);
-            Task putItem = table.PutItemAsync(doc);
-            putItem.Wait();
-            return "Done!";
+            return _dynamoTable.GetRoom(roomCode);
         }
     }
 }
