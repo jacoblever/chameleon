@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 
-namespace ChameleonGetRoomStatusFunction
+namespace GameLogic
 {
     public class RoomStatus
     {
@@ -19,6 +19,8 @@ namespace ChameleonGetRoomStatusFunction
         public int ChameleonCount { get; }
         public string State { get; }
         public string Character { get; }
+        
+        // TODO: This is a very UI thing and so does not belong in Game Logic
         public int TimeToPollMillisecond { get; }
 
         public override bool Equals(object obj)

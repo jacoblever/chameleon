@@ -1,4 +1,4 @@
-﻿namespace ChameleonGetRoomStatusFunction
+namespace GameLogic
 {
     public enum RoomState
     {

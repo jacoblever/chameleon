@@ -5,19 +5,14 @@ namespace DataStore.Tests
 {
     public class DynamoBackedClientTests
     {
-        [SetUp]
-        public void SetUp() => Client.UseDynamoLocal = true;
-
-        [TearDown]
-        public void TearDown() => Client.UseDynamoLocal = false;
-
         [Test]
         public void TestCanSaveRoom()
         {
-            var room = Client.CreateRoom();
-            var personAdded = Client.CreatePersonInRoom(room.RoomCode);
+            var roomStore = RoomStore.Create(new DynamoTable(true));
+            var room = roomStore.CreateRoom();
+            var personAdded = roomStore.CreatePersonInRoom(room.RoomCode);
             
-            var roomFromDb = Client.GetRoom(room.RoomCode);
+            var roomFromDb = roomStore.GetRoom(room.RoomCode);
             Assert.That(roomFromDb.PersonIds.Count, Is.EqualTo(1));
             Assert.That(roomFromDb.PersonIds.First(), Is.EqualTo(personAdded));
         }
@@ -25,7 +20,8 @@ namespace DataStore.Tests
         [Test]
         public void TestGetNonExistentRoom()
         {
-            var roomFromDb = Client.GetRoom("hello");
+            var roomStore = RoomStore.Create(new DynamoTable(true));
+            var roomFromDb = roomStore.GetRoom("not-a-room");
             Assert.That(roomFromDb, Is.Null);
         }
     }

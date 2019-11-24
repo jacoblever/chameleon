@@ -9,6 +9,6 @@
     <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DataStore\DataStore.csproj" />
+    <ProjectReference Include="..\GameLogic\GameLogic.csproj" />
   </ItemGroup>
 </Project>
