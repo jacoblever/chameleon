@@ -61,7 +61,11 @@ class InRoomComponent extends React.Component {
             <div>There are {this.state.numberOfPeopleInRoom} people in the room, {this.state.numberOfChameleonsInRoom} of them are Chameleons!</div>
             {this.state.roomState === "PreGame" ? (
               <div>
-                <button onClick={this.startGame}>Start Game</button>
+                {this.state.numberOfPeopleInRoom < 3 ? (
+                  <div>You need at least 3 people to play a game!</div>
+                ) : (
+                  <button onClick={this.startGame}>Start Game</button>
+                )}
               </div>
             ) : (
               <div>
