@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
@@ -31,6 +32,15 @@ namespace ChameleonStartGameFunction
                 {
                     StatusCode = 403,
                     Body = e.Message,
+                    Headers = new Dictionary<string, string>(),
+                };
+            }
+            catch (Exception e)
+            {
+                return new APIGatewayProxyResponse
+                {
+                    StatusCode = 500,
+                    Body = $"{e.Message}\n{e.StackTrace}",
                     Headers = new Dictionary<string, string>(),
                 };
             }
