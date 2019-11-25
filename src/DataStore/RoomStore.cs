@@ -54,7 +54,7 @@ namespace DataStore
                 room.SetCharacter(personId,
                     chameleons.Contains(personId)
                         ? "chameleon"
-                        : "Pizza");
+                        : word);
             }
             _dynamoTable.SaveRoom(room);
         }
