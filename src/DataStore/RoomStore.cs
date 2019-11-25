@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace DataStore
@@ -44,12 +45,16 @@ namespace DataStore
             return personId;
         }
 
-        public void StartGame(string roomCode)
+        public void StartGame(string roomCode, string word, IEnumerable<string> chameleons)
         {
+            chameleons = chameleons.ToList();
             var room = GetRoom(roomCode);
             foreach (var personId in room.PersonIds.Select(x => x).ToList())
             {
-                room.SetCharacter(personId, "Pizza");
+                room.SetCharacter(personId,
+                    chameleons.Contains(personId)
+                        ? "chameleon"
+                        : "Pizza");
             }
             _dynamoTable.SaveRoom(room);
         }
