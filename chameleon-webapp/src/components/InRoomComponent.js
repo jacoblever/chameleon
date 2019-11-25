@@ -69,7 +69,11 @@ class InRoomComponent extends React.Component {
               </div>
             ) : (
               <div>
-                <div>The word is {this.state.character}</div>
+                {this.state.character === "chameleon" ? (
+                  <div>You are a chameleon!</div>
+                ) : (
+                  <div>The word is '{this.state.character}'</div>
+                )}
                 <button onClick={this.startGame}>Start New Game</button>
               </div>
             )}
