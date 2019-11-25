@@ -9,9 +9,9 @@ namespace GameLogic
         private readonly IRoomStore _roomStore;
         
         // TODO: Move this to some dependency manager
-        public static IChameleonGame Create()
+        public static IChameleonGame Create(IRoomStore roomStore = null)
         {
-            return new ChameleonGame();
+            return new ChameleonGame(roomStore);
         }
         
         private ChameleonGame(IRoomStore roomStore = null)
@@ -73,7 +73,6 @@ namespace GameLogic
             }
         }
 
-        // ReSharper disable once PossibleLossOfFraction
-        private static int GetChameleonCount(int peopleCount) => (int)Math.Ceiling((double)(peopleCount / 6));
+        private static int GetChameleonCount(int peopleCount) => (int)Math.Ceiling((double)peopleCount / 6);
     }
 }
