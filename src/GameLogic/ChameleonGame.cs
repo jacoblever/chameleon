@@ -55,8 +55,13 @@ namespace GameLogic
         {
             var room = _roomStore.GetRoom(roomCode);
             EnsurePersonInRoom(roomCode, personId, room);
-            
-            _roomStore.StartGame(roomCode);
+            var word = new Words().GetRandomWord();
+
+            var random = new Random();
+            var chameleons = room.PersonIds.OrderBy(x => random.Next())
+                .ToArray()
+                .Take(GetChameleonCount(room.PersonIds.Count));
+            _roomStore.StartGame(roomCode, word, chameleons);
         }
 
         private static void EnsurePersonInRoom(string roomCode, string personId, Room room)
@@ -68,6 +73,7 @@ namespace GameLogic
             }
         }
 
+        // ReSharper disable once PossibleLossOfFraction
         private static int GetChameleonCount(int peopleCount) => (int)Math.Ceiling((double)(peopleCount / 6));
     }
 }

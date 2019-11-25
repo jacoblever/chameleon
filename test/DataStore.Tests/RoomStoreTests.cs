@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
@@ -19,12 +20,12 @@ namespace DataStore.Tests
             dynamoTable.Setup(foo => foo.GetRoom(roomCode)).Returns(room);
             
             var roomStore = RoomStore.Create(dynamoTable.Object);
-            
-            roomStore.StartGame(roomCode);
+
+            roomStore.StartGame(roomCode, "Pizza", new List<string> {"person-1"});
             
             var expectedRoom = new Room();
             expectedRoom.AddPerson("person-1");
-            expectedRoom.SetCharacter("person-1", "Pizza");
+            expectedRoom.SetCharacter("person-1", "chameleon");
             expectedRoom.AddPerson("person-2");
             expectedRoom.SetCharacter("person-2", "Pizza");
             expectedRoom.AddPerson("person-3");
