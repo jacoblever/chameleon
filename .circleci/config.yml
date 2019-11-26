@@ -7,7 +7,7 @@ test_steps: &test_steps
     - checkout
     - run: find .
     - run: dotnet restore
-#    - run: dotnet test
+    - run: dotnet test
 
 deploy_steps: &deploy_steps
   docker:
