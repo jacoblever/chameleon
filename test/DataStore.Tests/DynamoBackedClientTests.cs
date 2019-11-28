@@ -3,6 +3,8 @@ using NUnit.Framework;
 
 namespace DataStore.Tests
 {
+    [TestFixture]
+    [Category("DynamoTests")]
     public class DynamoBackedClientTests
     {
         [Test]
