@@ -19,20 +19,22 @@ namespace GameLogic
             _roomStore = roomStore ?? RoomStore.Create();
         }
 
-        public RoomAndPerson JoinOrCreateRoom(string roomCode)
+        public RoomAndPerson CreateRoom()
         {
-            if (roomCode == null)
+            var room = _roomStore.CreateRoom();
+            var personId = _roomStore.CreatePersonInRoom(room.RoomCode);
+            return new RoomAndPerson(room.RoomCode, personId);
+        }
+
+        public RoomAndPerson JoinRoom(string roomCode)
+        {
+            if (!_roomStore.DoesRoomExist(roomCode))
             {
-                var room = _roomStore.CreateRoom();
-                var personId = _roomStore.CreatePersonInRoom(room.RoomCode);
-                return new RoomAndPerson(room.RoomCode, personId);
+                throw new RoomDoesNotExistException(roomCode);
             }
-            if (_roomStore.DoesRoomExist(roomCode))
-            {
-                var personId = _roomStore.CreatePersonInRoom(roomCode);
-                return new RoomAndPerson(roomCode, personId);
-            }
-            throw new NotImplementedException();
+
+            var personId = _roomStore.CreatePersonInRoom(roomCode);
+            return new RoomAndPerson(roomCode, personId);
         }
 
         public RoomStatus GetRoomStatus(string roomCode, string personId)

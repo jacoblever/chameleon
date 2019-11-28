@@ -9,6 +9,58 @@ namespace GameLogic.Tests
     public class ChameleonGameTests
     {
         [Test]
+        public void TestCanCreateRoom()
+        {
+            const string roomCode = "AAAA";
+
+            var roomStore = new Mock<IRoomStore>();
+            var chameleonGame = ChameleonGame.Create(roomStore.Object);
+
+            roomStore.Setup(x => x.CreateRoom())
+                .Returns(new Room {RoomCode = roomCode});
+            
+            chameleonGame.CreateRoom();
+            
+            roomStore.Verify(x => x.CreateRoom());
+            roomStore.Verify(x => x.CreatePersonInRoom(roomCode));
+        }
+        
+        [Test]
+        public void TestCanJoinExistingRoom()
+        {
+            const string roomCode = "BBBB";
+            
+            var roomStore = new Mock<IRoomStore>();
+            var chameleonGame = ChameleonGame.Create(roomStore.Object);
+
+            roomStore.Setup(x => x.DoesRoomExist(roomCode)).Returns(true);
+            
+            chameleonGame.JoinRoom(roomCode);
+            
+            roomStore.Verify(x => x.CreatePersonInRoom(roomCode));
+        }
+        
+        [Test]
+        public void TestCannotJoinNonExistingRoom()
+        {
+            const string roomCode = "CCCC";
+            
+            var roomStore = new Mock<IRoomStore>();
+            var chameleonGame = ChameleonGame.Create(roomStore.Object);
+
+            roomStore.Setup(x => x.DoesRoomExist(roomCode)).Returns(false);
+
+            Assert.Throws<RoomDoesNotExistException>(() =>
+            {
+                chameleonGame.JoinRoom(roomCode);
+            });
+
+            roomStore.Verify(
+                x => x.CreatePersonInRoom(roomCode),
+                Times.Never);
+        }
+        
+        [Test]
         public void TestCanStartGame()
         {
             const string roomCode = "AAAA";
