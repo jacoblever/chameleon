@@ -15,6 +15,10 @@ build:
 test:
 	dotnet test
 
+.PHONY: test_not_dynamo
+test_not_dynamo:
+	dotnet test --filter TestCategory!=DynamoTests
+
 .PHONY: dynamo_server
 dynamo_server:
 	@echo "Running local dynamo server"
