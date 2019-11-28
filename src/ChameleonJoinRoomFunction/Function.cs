@@ -8,10 +8,21 @@ namespace ChameleonJoinRoomFunction
 {
     public class Function
     {
+        // TODO: Make this a lambda proxy like the others
         public Person FunctionHandler(JoinRoomRequest input, ILambdaContext context)
         {
-            var roomAndPerson = ChameleonGame.Create().JoinOrCreateRoom(input.RoomCode);
-            return new Person(roomAndPerson.RoomCode, roomAndPerson.PersonId);
+            try
+            {
+                var chameleonGame = ChameleonGame.Create();
+                var roomAndPerson = input.RoomCode == null
+                    ? chameleonGame.CreateRoom()
+                    : chameleonGame.JoinRoom(input.RoomCode);
+                return new Person(roomAndPerson.RoomCode, roomAndPerson.PersonId);
+            }
+            catch (RoomDoesNotExistException e)
+            {
+                return new Person(input.RoomCode, e.Message);
+            }
         }
     }
 
