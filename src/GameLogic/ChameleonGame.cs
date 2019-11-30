@@ -59,7 +59,7 @@ namespace GameLogic
             EnsurePersonInRoom(roomCode, personId, room);
             var word = new Words().GetRandomWord();
 
-            var random = new Random();
+            var random = new System.Random();
             var chameleons = room.PersonIds.OrderBy(x => random.Next())
                 .ToArray()
                 .Take(GetChameleonCount(room.PersonIds.Count));
