@@ -8,6 +8,62 @@ namespace DataStore.Tests
     public class RoomStoreTests
     {
         [Test]
+        public void TestCanCreateRoom()
+        {
+            var existingRoom = new Room{RoomCode = "ABCD"};
+            var dynamoTable = new Mock<IDynamoTable>();
+            dynamoTable.Setup(foo => foo.GetRoom(existingRoom.RoomCode)).Returns(existingRoom);
+            
+            var randomRoomCode = new Mock<IRandomRoomCode>();
+            randomRoomCode.Setup(x => x.Generate())
+                .Returns("WXYZ");
+
+            var roomStore = RoomStore.Create(dynamoTable.Object, randomRoomCode.Object);
+
+            roomStore.CreateRoom();
+
+            dynamoTable.Verify(x => x.SaveRoom(It.Is<Room>(y => y.RoomCode == "WXYZ")), Times.Once);
+        }
+        
+        [Test]
+        public void TestCanCreateRoomWhenRandomClashesWithExistingRoom()
+        {
+            var existingRoom = new Room{RoomCode = "ABCD"};
+            var dynamoTable = new Mock<IDynamoTable>();
+            dynamoTable.Setup(foo => foo.GetRoom(existingRoom.RoomCode)).Returns(existingRoom);
+            
+            var randomRoomCode = new Mock<IRandomRoomCode>();
+            randomRoomCode.SetupSequence(x => x.Generate())
+                .Returns(existingRoom.RoomCode)
+                .Returns("WXYZ");
+
+            var roomStore = RoomStore.Create(dynamoTable.Object, randomRoomCode.Object);
+
+            roomStore.CreateRoom();
+
+            dynamoTable.Verify(x => x.SaveRoom(It.Is<Room>(y => y.RoomCode == "WXYZ")), Times.Once);
+        }
+        
+        [Test]
+        public void TestCreateRoomDoesNotCauseInfiniteLoop()
+        {
+            var existingRoom = new Room{RoomCode = "ABCD"};
+            var dynamoTable = new Mock<IDynamoTable>();
+            dynamoTable.Setup(foo => foo.GetRoom(existingRoom.RoomCode)).Returns(existingRoom);
+            
+            var randomRoomCode = new Mock<IRandomRoomCode>();
+            randomRoomCode.Setup(x => x.Generate())
+                .Returns(existingRoom.RoomCode);
+
+            var roomStore = RoomStore.Create(dynamoTable.Object, randomRoomCode.Object);
+
+            Assert.Throws<CouldNotFindAvailableRoomCodeException>(() => roomStore.CreateRoom());
+            dynamoTable.Verify(
+                x => x.SaveRoom(It.IsAny<Room>()),
+                Times.Never);
+        }
+    
+        [Test]
         public void TestCanStartGame()
         {
             const string roomCode = "AAAA";

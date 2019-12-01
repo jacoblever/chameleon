@@ -14,7 +14,7 @@ namespace GameLogic
             return new ChameleonGame(roomStore);
         }
         
-        private ChameleonGame(IRoomStore roomStore = null)
+        private ChameleonGame(IRoomStore roomStore)
         {
             _roomStore = roomStore ?? RoomStore.Create();
         }
