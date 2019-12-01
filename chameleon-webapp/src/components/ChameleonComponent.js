@@ -15,8 +15,8 @@ class ChameleonComponent extends React.Component {
   }
 
   onRoomJoined(roomCode, personId) {
-    Cookies.set('personId', personId);
-    Cookies.set('roomCode', roomCode);
+    Cookies.set('personId', personId, { expires: 1 });
+    Cookies.set('roomCode', roomCode, { expires: 1 });
     this.setState({roomCode: roomCode, personId: personId});
   }
   
