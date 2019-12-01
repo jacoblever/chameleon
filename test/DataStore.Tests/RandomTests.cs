@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using Moq;
 using NUnit.Framework;
 
 namespace DataStore.Tests
@@ -10,9 +7,9 @@ namespace DataStore.Tests
         [Test]
         public void TestGenerateRoomCode()
         {
-            var random = new Random();
+            var randomRoomCode = new RandomRoomCode();
             
-            var roomCode = random.GenerateRoomCode();
+            var roomCode = randomRoomCode.Generate();
             
             Assert.That(roomCode.Length, Is.EqualTo(4));
         }
