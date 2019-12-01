@@ -14,7 +14,7 @@ namespace GameLogic
             return new ChameleonGame(roomStore);
         }
         
-        private ChameleonGame(IRoomStore roomStore = null)
+        private ChameleonGame(IRoomStore roomStore)
         {
             _roomStore = roomStore ?? RoomStore.Create();
         }
@@ -59,7 +59,7 @@ namespace GameLogic
             EnsurePersonInRoom(roomCode, personId, room);
             var word = new Words().GetRandomWord();
 
-            var random = new System.Random();
+            var random = new Random();
             var chameleons = room.PersonIds.OrderBy(x => random.Next())
                 .ToArray()
                 .Take(GetChameleonCount(room.PersonIds.Count));

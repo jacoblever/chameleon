@@ -14,11 +14,11 @@ namespace DataStore.Tests
             var dynamoTable = new Mock<IDynamoTable>();
             dynamoTable.Setup(foo => foo.GetRoom(existingRoom.RoomCode)).Returns(existingRoom);
             
-            var random = new Mock<IRandom>();
-            random.Setup(x => x.GenerateRoomCode())
+            var randomRoomCode = new Mock<IRandomRoomCode>();
+            randomRoomCode.Setup(x => x.Generate())
                 .Returns("WXYZ");
 
-            var roomStore = RoomStore.Create(dynamoTable.Object, random.Object);
+            var roomStore = RoomStore.Create(dynamoTable.Object, randomRoomCode.Object);
 
             roomStore.CreateRoom();
 
@@ -32,12 +32,12 @@ namespace DataStore.Tests
             var dynamoTable = new Mock<IDynamoTable>();
             dynamoTable.Setup(foo => foo.GetRoom(existingRoom.RoomCode)).Returns(existingRoom);
             
-            var random = new Mock<IRandom>();
-            random.SetupSequence(x => x.GenerateRoomCode())
+            var randomRoomCode = new Mock<IRandomRoomCode>();
+            randomRoomCode.SetupSequence(x => x.Generate())
                 .Returns(existingRoom.RoomCode)
                 .Returns("WXYZ");
 
-            var roomStore = RoomStore.Create(dynamoTable.Object, random.Object);
+            var roomStore = RoomStore.Create(dynamoTable.Object, randomRoomCode.Object);
 
             roomStore.CreateRoom();
 
@@ -51,14 +51,16 @@ namespace DataStore.Tests
             var dynamoTable = new Mock<IDynamoTable>();
             dynamoTable.Setup(foo => foo.GetRoom(existingRoom.RoomCode)).Returns(existingRoom);
             
-            var random = new Mock<IRandom>();
-            random.Setup(x => x.GenerateRoomCode())
+            var randomRoomCode = new Mock<IRandomRoomCode>();
+            randomRoomCode.Setup(x => x.Generate())
                 .Returns(existingRoom.RoomCode);
 
-            var roomStore = RoomStore.Create(dynamoTable.Object, random.Object);
+            var roomStore = RoomStore.Create(dynamoTable.Object, randomRoomCode.Object);
 
             Assert.Throws<CouldNotFindAvailableRoomCodeException>(() => roomStore.CreateRoom());
-            dynamoTable.Verify(x => x.SaveRoom(It.IsAny<Room>()), Times.Never);
+            dynamoTable.Verify(
+                x => x.SaveRoom(It.IsAny<Room>()),
+                Times.Never);
         }
     
         [Test]

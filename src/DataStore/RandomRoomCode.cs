@@ -1,14 +1,15 @@
+using System;
 using System.Text;
 
 namespace DataStore
 {
-    public class Random : IRandom
+    public class RandomRoomCode : IRandomRoomCode
     {
         private const string Letters = @"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-        public string GenerateRoomCode()
+        public string Generate()
         {
-            var random = new System.Random();
+            var random = new Random();
             var code = new StringBuilder();
             for (var i = 0; i < 4; i++)
             {
