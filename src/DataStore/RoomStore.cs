@@ -7,27 +7,44 @@ namespace DataStore
     public class RoomStore : IRoomStore
     {
         private readonly IDynamoTable _dynamoTable;
+        private readonly IRandomRoomCode _randomRoomCode;
 
         // TODO: Move this to some dependency manager
-        public static IRoomStore Create(IDynamoTable dynamoTable = null)
+        public static IRoomStore Create(IDynamoTable dynamoTable = null, IRandomRoomCode randomRoomCode = null)
         {
-            return new RoomStore(dynamoTable);
+            return new RoomStore(dynamoTable, randomRoomCode);
         }
         
-        private RoomStore(IDynamoTable dynamoTable = null)
+        private RoomStore(IDynamoTable dynamoTable, IRandomRoomCode randomRoomCode)
         {
             _dynamoTable = dynamoTable ?? new DynamoTable();
+            _randomRoomCode = randomRoomCode ?? new RandomRoomCode();
         }
 
         public Room CreateRoom()
         {
-            var roomCode = "ABCD";
+            var roomCode = FindAvailableRoomCode();
             var room = new Room
             {
                 RoomCode = roomCode
             };
             _dynamoTable.SaveRoom(room);
             return room;
+        }
+
+        private string FindAvailableRoomCode()
+        {
+            const int maximumAttempts = 10;
+            for (var i = 0; i < maximumAttempts; i++)
+            {
+                var roomCode = _randomRoomCode.Generate();
+                if (!DoesRoomExist(roomCode))
+                {
+                    return roomCode;
+                }
+            }
+
+            throw new CouldNotFindAvailableRoomCodeException(maximumAttempts);
         }
 
         public bool DoesRoomExist(string roomCode)
