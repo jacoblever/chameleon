@@ -9,5 +9,6 @@ namespace DataStore
         string CreatePersonInRoom(string roomCode);
         void StartGame(string roomCode, string word, IEnumerable<string> chameleons);
         Room GetRoom(string roomCode);
+        void RemovePersonFromRoom(string roomCode, string personId);
     }
 }
