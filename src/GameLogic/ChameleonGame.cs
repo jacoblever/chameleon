@@ -66,6 +66,13 @@ namespace GameLogic
             _roomStore.StartGame(roomCode, word, chameleons);
         }
 
+        public void LeaveRoom(string roomCode, string personId)
+        {
+            var room = _roomStore.GetRoom(roomCode);
+            EnsurePersonInRoom(roomCode, personId, room);
+            _roomStore.RemovePersonFromRoom(roomCode, personId);
+        }
+
         private static void EnsurePersonInRoom(string roomCode, string personId, Room room)
         {
             if (!room.PersonIds.Contains(personId))

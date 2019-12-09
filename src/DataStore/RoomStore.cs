@@ -80,5 +80,12 @@ namespace DataStore
         {
             return _dynamoTable.GetRoom(roomCode);
         }
+
+        public void RemovePersonFromRoom(string roomCode, string personId)
+        {
+            var room = GetRoom(roomCode);
+            room.RemovePerson(personId);
+            _dynamoTable.SaveRoom(room);
+        }
     }
 }

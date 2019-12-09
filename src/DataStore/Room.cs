@@ -25,6 +25,11 @@ namespace DataStore
         {
             _dynamoModel.CharacterByPersonId.Add(personId, null);
         }
+        
+        public void RemovePerson(string personId)
+        {
+            _dynamoModel.CharacterByPersonId.Remove(personId);
+        }
 
         public void SetCharacter(string personId, string character)
         {
