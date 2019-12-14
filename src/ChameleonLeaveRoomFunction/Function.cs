@@ -23,7 +23,10 @@ namespace ChameleonLeaveRoomFunction
                 {
                     StatusCode = 204,
                     Body = "",
-                    Headers = new Dictionary<string, string>(),
+                    Headers = new Dictionary<string, string>
+                    {
+                        { "Access-Control-Allow-Origin", "*" },
+                    },
                 };
             }
             catch (PersonNotInRoomException e)
@@ -32,7 +35,10 @@ namespace ChameleonLeaveRoomFunction
                 {
                     StatusCode = 403,
                     Body = e.Message,
-                    Headers = new Dictionary<string, string>(),
+                    Headers = new Dictionary<string, string>
+                    {
+                        { "Access-Control-Allow-Origin", "*" },
+                    },
                 };
             }
             catch (Exception e)
@@ -41,7 +47,10 @@ namespace ChameleonLeaveRoomFunction
                 {
                     StatusCode = 500,
                     Body = $"{e.Message}\n{e.StackTrace}",
-                    Headers = new Dictionary<string, string>(),
+                    Headers = new Dictionary<string, string>
+                    {
+                        { "Access-Control-Allow-Origin", "*" },
+                    },
                 };
             }
         }
