@@ -52,7 +52,7 @@ class InRoomComponent extends React.Component {
         'X-Chameleon-PersonId': this.props.personId,
       }
     })
-    .catch((error) => { console.error(error); })
+    .catch((error) => { console.error(error); });
   }
 
   leaveRoom(e) {
