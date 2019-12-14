@@ -8,15 +8,20 @@ class InRoomComponent extends React.Component {
       numberOfChameleonsInRoom: null,
       roomState: null,
       character: null,
+      polling: true,
     };
 
     this.poll = this.poll.bind(this);
     this.startGame = this.startGame.bind(this);
+    this.leaveRoom = this.leaveRoom.bind(this);
 
     this.poll();
   }
 
   poll() {
+    if(!this.state.polling) {
+      return
+    }
     fetch(process.env.REACT_APP_CHAMELEON_BACKEND_BASE_URL + '/api/room-status/?RoomCode=' + this.props.roomCode, {
       method: 'GET',
       headers: {
@@ -47,6 +52,20 @@ class InRoomComponent extends React.Component {
         'X-Chameleon-PersonId': this.props.personId,
       }
     })
+    .catch((error) => { console.error(error); })
+  }
+
+  leaveRoom(e) {
+    this.setState({polling: false});
+    fetch(process.env.REACT_APP_CHAMELEON_BACKEND_BASE_URL + '/api/leave-room/?RoomCode=' + this.props.roomCode, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'X-Chameleon-PersonId': this.props.personId,
+      }
+    })
+    .then(() => this.props.onRoomLeft())
+    .catch((error) => { console.error(error); });
   }
   
   render() {
@@ -77,6 +96,7 @@ class InRoomComponent extends React.Component {
                 <button onClick={this.startGame}>Start New Game</button>
               </div>
             )}
+            <button onClick={this.leaveRoom}>Leave Room</button>
           </div>
         )}
       </div>
