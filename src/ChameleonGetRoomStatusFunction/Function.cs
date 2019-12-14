@@ -26,6 +26,7 @@ namespace ChameleonGetRoomStatusFunction
                     Headers = new Dictionary<string, string>
                     {
                         { "Content-Type", "application/json" },
+                        { "Access-Control-Allow-Origin", "*" },
                     },
                 };
             }
@@ -35,7 +36,10 @@ namespace ChameleonGetRoomStatusFunction
                 {
                     StatusCode = 403,
                     Body = e.Message,
-                    Headers = new Dictionary<string, string>(),
+                    Headers = new Dictionary<string, string>
+                    {
+                        { "Access-Control-Allow-Origin", "*" },
+                    },
                 };
             }
         }
