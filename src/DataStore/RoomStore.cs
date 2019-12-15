@@ -57,7 +57,8 @@ namespace DataStore
         {
             var room = GetRoom(roomCode);
             var personId = Guid.NewGuid().ToString();
-            room.AddPerson(personId);
+            var personName = "jacob";
+            room.AddPerson(personId, personName);
             _dynamoTable.SaveRoom(room);
             return personId;
         }

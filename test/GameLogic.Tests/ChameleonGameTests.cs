@@ -69,9 +69,9 @@ namespace GameLogic.Tests
             var chameleonGame = ChameleonGame.Create(mockRoomStore.Object);
 
             var room = new Room();
-            room.AddPerson("person-1");
-            room.AddPerson("person-2");
-            room.AddPerson("person-3");
+            room.AddPerson("person-1", "jacob");
+            room.AddPerson("person-2", "anita");
+            room.AddPerson("person-3", "robin");
 
             mockRoomStore.Setup(x => x.GetRoom(roomCode)).Returns(room);
             
