@@ -19,26 +19,26 @@ namespace DataStore
             set => _dynamoModel.RoomCode = value;
         }
 
-        public IReadOnlyCollection<string> PersonIds => _dynamoModel.CharacterByPersonId.Keys;
+        public IReadOnlyCollection<string> PersonIds => _dynamoModel.PersonByPersonId.Keys;
 
-        public void AddPerson(string personId)
+        public void AddPerson(string personId, string personName)
         {
-            _dynamoModel.CharacterByPersonId.Add(personId, null);
+            _dynamoModel.PersonByPersonId.Add(personId, new DynamoModel.Person {Name = personName, Character = null});
         }
         
         public void RemovePerson(string personId)
         {
-            _dynamoModel.CharacterByPersonId.Remove(personId);
+            _dynamoModel.PersonByPersonId.Remove(personId);
         }
 
         public void SetCharacter(string personId, string character)
         {
-            _dynamoModel.CharacterByPersonId[personId] = character;
+            _dynamoModel.PersonByPersonId[personId].Character = character;
         }
 
         public string GetCharacterFor(string personId)
         {
-            return _dynamoModel.CharacterByPersonId[personId];
+            return _dynamoModel.PersonByPersonId[personId].Character;
         }
 
         internal DynamoModel GetDynamoModel()
@@ -49,7 +49,13 @@ namespace DataStore
         internal class DynamoModel
         {
             public string RoomCode { get; set; }
-            public Dictionary<string, string> CharacterByPersonId { get; set; } = new Dictionary<string, string>();
+            public Dictionary<string, Person> PersonByPersonId { get; set; } = new Dictionary<string, Person>();
+
+            internal class Person
+            {
+                public string Name { get; set; }
+                public string Character { get; set; }
+            }
         }
     }
 }
