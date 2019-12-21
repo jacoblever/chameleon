@@ -31,8 +31,8 @@ class JoinRoomComponent extends React.Component {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        roomCode: roomCode,
-        personName: personName,
+        RoomCode: roomCode,
+        PersonName: personName,
       })
     })
       .then(response => response.json())
@@ -51,11 +51,20 @@ class JoinRoomComponent extends React.Component {
   render() {
     return (
       <div>
-        <input type="text" value={this.state.personNameInput} onChange={this.handlePersonChange} />
+        <input
+          type="text"
+          value={this.state.personNameInput}
+          onChange={this.handlePersonChange}
+          placeholder="Enter your name" />
         <br/>
-        <button onClick={this.createRoom}>Create Room</button>        
+        <button onClick={this.createRoom}>Create Room</button>
+        <br /> or <br />
+        <input
+          type="text"
+          value={this.state.roomCodeInput}
+          onChange={this.handleRoomChange}
+          placeholder="Enter 4 letter room code" />
         <button onClick={this.joinRoom}>Join Room</button>
-        <input type="text" value={this.state.roomCodeInput} onChange={this.handleRoomChange} />
       </div>
     );
   }
