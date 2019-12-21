@@ -10,6 +10,7 @@ class JoinRoomComponent extends React.Component {
 
     this.handleRoomChange = this.handleRoomChange.bind(this);
     this.handlePersonChange = this.handlePersonChange.bind(this);
+    this.handleRoomCodeKeyUp = this.handleRoomCodeKeyUp.bind(this);
     this.createRoom = this.createRoom.bind(this);
     this.joinRoom = this.joinRoom.bind(this);
     this.makeJoinRoomRequest = this.makeJoinRoomRequest.bind(this);
@@ -48,6 +49,13 @@ class JoinRoomComponent extends React.Component {
     this.setState({personNameInput: event.target.value});
   }
 
+  handleRoomCodeKeyUp(event) {
+    if (event.keyCode === 13) { // enter key
+      this.makeJoinRoomRequest(this.state.roomCodeInput, this.state.personNameInput);
+      event.preventDefault();
+    }
+  }
+
   render() {
     return (
       <div>
@@ -63,6 +71,7 @@ class JoinRoomComponent extends React.Component {
           type="text"
           value={this.state.roomCodeInput}
           onChange={this.handleRoomChange}
+          onKeyUp={this.handleRoomCodeKeyUp}
           placeholder="Enter 4 letter room code" />
         <button onClick={this.joinRoom}>Join Room</button>
       </div>
