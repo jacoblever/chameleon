@@ -12,7 +12,7 @@ namespace DataStore.Tests
         {
             var roomStore = RoomStore.Create(new DynamoTable(true));
             var room = roomStore.CreateRoom();
-            var personAdded = roomStore.CreatePersonInRoom(room.RoomCode);
+            var personAdded = roomStore.CreatePersonInRoom(room.RoomCode, "Jacob");
             
             var roomFromDb = roomStore.GetRoom(room.RoomCode);
             Assert.That(roomFromDb.PersonIds.Count, Is.EqualTo(1));
