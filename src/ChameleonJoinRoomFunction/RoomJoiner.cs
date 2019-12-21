@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using GameLogic;
 using Newtonsoft.Json.Linq;
 
@@ -15,12 +16,28 @@ namespace ChameleonJoinRoomFunction
         public Person Join(string requestBody)
         {
             var body = JObject.Parse(requestBody);
-            var roomCode = body["RoomCode"];
-            var personName = body["PersonName"];
-            
-            var roomAndPerson = roomCode == null
-                ? _chameleonGame.CreateRoom(personName.ToString())
-                : _chameleonGame.JoinRoom(roomCode.ToString(), personName.ToString());
+            var roomCodeToken = body["RoomCode"];
+            var personNameToken = body["PersonName"];
+            var personName = personNameToken?.ToString() ?? "";
+            if (personName.Length == 0)
+            {
+                throw new PersonNameMustBeSpecifiedException();
+            }
+
+            RoomAndPerson roomAndPerson;
+            if (roomCodeToken?.Value<string>() == null)
+            {
+                roomAndPerson = _chameleonGame.CreateRoom(personName);
+            }
+            else
+            {
+                var roomCode = roomCodeToken.ToString();
+                if (!Regex.IsMatch(roomCode, "[A-Z]{4}"))
+                {
+                    throw new RoomCodeMustBeValidException();
+                }
+                roomAndPerson = _chameleonGame.JoinRoom(roomCode, personName);
+            }
             return new Person(roomAndPerson.RoomCode, roomAndPerson.PersonId);
         }
     }
