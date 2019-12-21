@@ -4,9 +4,10 @@ namespace GameLogic
 {
     public class RoomStatus
     {
-        public RoomStatus(string code, int peopleCount, int chameleonCount, string state, string character)
+        public RoomStatus(string code, string name, int peopleCount, int chameleonCount, string state, string character)
         {
             Code = code;
+            Name = name;
             PeopleCount = peopleCount;
             ChameleonCount = chameleonCount;
             State = state;
@@ -14,6 +15,7 @@ namespace GameLogic
             TimeToPollMillisecond = 5000;
         }
 
+        public string Name { get; set; }
         public string Code { get; }
         public int PeopleCount { get; }
         public int ChameleonCount { get; }

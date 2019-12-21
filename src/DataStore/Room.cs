@@ -21,6 +21,11 @@ namespace DataStore
 
         public IReadOnlyCollection<string> PersonIds => _dynamoModel.PersonByPersonId.Keys;
 
+        public string GetNameFor(string personId)
+        {
+            return _dynamoModel.PersonByPersonId[personId].Name;
+        }
+        
         public void AddPerson(string personId, string personName)
         {
             _dynamoModel.PersonByPersonId.Add(personId, new DynamoModel.Person {Name = personName, Character = null});
