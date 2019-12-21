@@ -19,10 +19,10 @@ namespace GameLogic.Tests
             roomStore.Setup(x => x.CreateRoom())
                 .Returns(new Room {RoomCode = roomCode});
             
-            chameleonGame.CreateRoom();
+            chameleonGame.CreateRoom("Jacob");
             
             roomStore.Verify(x => x.CreateRoom());
-            roomStore.Verify(x => x.CreatePersonInRoom(roomCode));
+            roomStore.Verify(x => x.CreatePersonInRoom(roomCode, "Jacob"));
         }
         
         [Test]
@@ -35,9 +35,9 @@ namespace GameLogic.Tests
 
             roomStore.Setup(x => x.DoesRoomExist(roomCode)).Returns(true);
             
-            chameleonGame.JoinRoom(roomCode);
+            chameleonGame.JoinRoom(roomCode, "Jacob");
             
-            roomStore.Verify(x => x.CreatePersonInRoom(roomCode));
+            roomStore.Verify(x => x.CreatePersonInRoom(roomCode, "Jacob"));
         }
         
         [Test]
@@ -52,11 +52,11 @@ namespace GameLogic.Tests
 
             Assert.Throws<RoomDoesNotExistException>(() =>
             {
-                chameleonGame.JoinRoom(roomCode);
+                chameleonGame.JoinRoom(roomCode, "Jacob");
             });
 
             roomStore.Verify(
-                x => x.CreatePersonInRoom(roomCode),
+                x => x.CreatePersonInRoom(roomCode, It.IsAny<string>()),
                 Times.Never);
         }
         

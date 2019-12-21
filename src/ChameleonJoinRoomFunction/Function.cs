@@ -15,8 +15,8 @@ namespace ChameleonJoinRoomFunction
             {
                 var chameleonGame = ChameleonGame.Create();
                 var roomAndPerson = input.RoomCode == null
-                    ? chameleonGame.CreateRoom()
-                    : chameleonGame.JoinRoom(input.RoomCode);
+                    ? chameleonGame.CreateRoom("Jacob")
+                    : chameleonGame.JoinRoom(input.RoomCode, "Jacob");
                 return new Person(roomAndPerson.RoomCode, roomAndPerson.PersonId);
             }
             catch (RoomDoesNotExistException e)
