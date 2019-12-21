@@ -19,21 +19,21 @@ namespace GameLogic
             _roomStore = roomStore ?? RoomStore.Create();
         }
 
-        public RoomAndPerson CreateRoom()
+        public RoomAndPerson CreateRoom(string personName)
         {
             var room = _roomStore.CreateRoom();
-            var personId = _roomStore.CreatePersonInRoom(room.RoomCode);
+            var personId = _roomStore.CreatePersonInRoom(room.RoomCode, personName);
             return new RoomAndPerson(room.RoomCode, personId);
         }
 
-        public RoomAndPerson JoinRoom(string roomCode)
+        public RoomAndPerson JoinRoom(string roomCode, string personName)
         {
             if (!_roomStore.DoesRoomExist(roomCode))
             {
                 throw new RoomDoesNotExistException(roomCode);
             }
 
-            var personId = _roomStore.CreatePersonInRoom(roomCode);
+            var personId = _roomStore.CreatePersonInRoom(roomCode, personName);
             return new RoomAndPerson(roomCode, personId);
         }
 
@@ -42,11 +42,13 @@ namespace GameLogic
             var room = _roomStore.GetRoom(roomCode);
             EnsurePersonInRoom(roomCode, personId, room);
 
+            var name = room.GetNameFor(personId);
             var peopleCount = room.PersonIds.Count;
             var myCharacter = room.GetCharacterFor(personId);
 
             return new RoomStatus(
                 code: roomCode,
+                name: name,
                 peopleCount: peopleCount,
                 chameleonCount: GetChameleonCount(peopleCount),
                 state: myCharacter == null ? RoomState.PreGame.ToString() : RoomState.InGame.ToString(),

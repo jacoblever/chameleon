@@ -69,9 +69,9 @@ namespace DataStore.Tests
             const string roomCode = "AAAA";
             
             var room = new Room();
-            room.AddPerson("person-1");
-            room.AddPerson("person-2");
-            room.AddPerson("person-3");
+            room.AddPerson("person-1", "jacob");
+            room.AddPerson("person-2", "anita");
+            room.AddPerson("person-3", "robin");
             var dynamoTable = new Mock<IDynamoTable>();
             dynamoTable.Setup(foo => foo.GetRoom(roomCode)).Returns(room);
             
@@ -80,8 +80,8 @@ namespace DataStore.Tests
             roomStore.RemovePersonFromRoom(roomCode, "person-1");
             
             var expectedRoom = new Room();
-            expectedRoom.AddPerson("person-2");
-            expectedRoom.AddPerson("person-3");
+            expectedRoom.AddPerson("person-2", "anita");
+            expectedRoom.AddPerson("person-3", "robin");
             dynamoTable.Verify(x => x.SaveRoom(It.Is<Room>(y => y.IsTheSameAs(expectedRoom))), Times.Once);
         }
         
@@ -92,9 +92,9 @@ namespace DataStore.Tests
             const string word = "Thing";
             
             var room = new Room();
-            room.AddPerson("person-1");
-            room.AddPerson("person-2");
-            room.AddPerson("person-3");
+            room.AddPerson("person-1", "jacob");
+            room.AddPerson("person-2", "anita");
+            room.AddPerson("person-3", "robin");
             var dynamoTable = new Mock<IDynamoTable>();
             dynamoTable.Setup(foo => foo.GetRoom(roomCode)).Returns(room);
             
@@ -103,11 +103,11 @@ namespace DataStore.Tests
             roomStore.StartGame(roomCode, word, new List<string> {"person-1"});
             
             var expectedRoom = new Room();
-            expectedRoom.AddPerson("person-1");
+            expectedRoom.AddPerson("person-1", "jacob");
             expectedRoom.SetCharacter("person-1", "chameleon");
-            expectedRoom.AddPerson("person-2");
+            expectedRoom.AddPerson("person-2", "anita");
             expectedRoom.SetCharacter("person-2", word);
-            expectedRoom.AddPerson("person-3");
+            expectedRoom.AddPerson("person-3", "robin");
             expectedRoom.SetCharacter("person-3", word);
             dynamoTable.Verify(x => x.SaveRoom(It.Is<Room>(y => y.IsTheSameAs(expectedRoom))), Times.Once);
         }

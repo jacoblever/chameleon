@@ -4,6 +4,7 @@ class InRoomComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      name: null,
       numberOfPeopleInRoom: null,
       numberOfChameleonsInRoom: null,
       roomState: null,
@@ -32,6 +33,7 @@ class InRoomComponent extends React.Component {
       .then(response => response.json())
       .then(jsonBody => {
         this.setState({
+          name: jsonBody.Name,
           numberOfPeopleInRoom: jsonBody.PeopleCount,
           numberOfChameleonsInRoom: jsonBody.ChameleonCount,
           roomState: jsonBody.State,
@@ -71,12 +73,12 @@ class InRoomComponent extends React.Component {
   render() {
     return (
       <div>
-        Welcome {this.props.personId} to room {this.props.roomCode}.
-        <br />
         {this.state.roomState === null ? (
           <div>Loading...</div>
         ) : (
           <div>
+            Welcome {this.state.name} to room {this.props.roomCode}.
+            <br />
             <div>There are {this.state.numberOfPeopleInRoom} people in the room, {this.state.numberOfChameleonsInRoom} of them are Chameleons!</div>
             {this.state.roomState === "PreGame" ? (
               <div>
