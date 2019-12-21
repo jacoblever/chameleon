@@ -3,23 +3,27 @@ import React from 'react';
 class JoinRoomComponent extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { roomCode: '' };
+    this.state = {
+      roomCodeInput: '' ,
+      personNameInput: '',
+    };
 
-    this.handleChange = this.handleChange.bind(this);
+    this.handleRoomChange = this.handleRoomChange.bind(this);
+    this.handlePersonChange = this.handlePersonChange.bind(this);
     this.createRoom = this.createRoom.bind(this);
     this.joinRoom = this.joinRoom.bind(this);
     this.makeJoinRoomRequest = this.makeJoinRoomRequest.bind(this);
   }
 
   createRoom(e) {
-    this.makeJoinRoomRequest(null);
+    this.makeJoinRoomRequest(null, this.state.personNameInput);
   }
 
   joinRoom(e) {
-    this.makeJoinRoomRequest(this.state.roomCode);
+    this.makeJoinRoomRequest(this.state.roomCodeInput, this.state.personNameInput);
   }
 
-  makeJoinRoomRequest(roomCode) {
+  makeJoinRoomRequest(roomCode, personName) {
     fetch(process.env.REACT_APP_CHAMELEON_BACKEND_BASE_URL + '/api/join-room/', {
       method: 'POST',
       headers: {
@@ -28,6 +32,7 @@ class JoinRoomComponent extends React.Component {
       },
       body: JSON.stringify({
         roomCode: roomCode,
+        personName: personName,
       })
     })
       .then(response => response.json())
@@ -35,17 +40,22 @@ class JoinRoomComponent extends React.Component {
       .catch((error) => { console.error(error); })
   }
 
-  handleChange(event) {
-    this.setState({roomCode: event.target.value});
+  handleRoomChange(event) {
+    this.setState({roomCodeInput: event.target.value});
+  }
+
+  handlePersonChange(event) {
+    this.setState({personNameInput: event.target.value});
   }
 
   render() {
     return (
       <div>
-        <button onClick={this.createRoom}>Create Room</button>
+        <input type="text" value={this.state.personNameInput} onChange={this.handlePersonChange} />
         <br/>
+        <button onClick={this.createRoom}>Create Room</button>        
         <button onClick={this.joinRoom}>Join Room</button>
-        <input type="text" value={this.state.roomCode} onChange={this.handleChange} />
+        <input type="text" value={this.state.roomCodeInput} onChange={this.handleRoomChange} />
       </div>
     );
   }
