@@ -42,11 +42,13 @@ namespace GameLogic
             var room = _roomStore.GetRoom(roomCode);
             EnsurePersonInRoom(roomCode, personId, room);
 
+            var name = room.GetNameFor(personId);
             var peopleCount = room.PersonIds.Count;
             var myCharacter = room.GetCharacterFor(personId);
 
             return new RoomStatus(
                 code: roomCode,
+                name: name,
                 peopleCount: peopleCount,
                 chameleonCount: GetChameleonCount(peopleCount),
                 state: myCharacter == null ? RoomState.PreGame.ToString() : RoomState.InGame.ToString(),
