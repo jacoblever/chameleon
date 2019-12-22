@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using DataStore;
 
@@ -52,7 +53,8 @@ namespace GameLogic
                 peopleCount: peopleCount,
                 chameleonCount: GetChameleonCount(peopleCount),
                 state: myCharacter == null ? RoomState.PreGame.ToString() : RoomState.InGame.ToString(),
-                character: myCharacter);
+                character: myCharacter,
+                firstPersonId: room.WhoGoesFirst());
         }
 
         public void StartGame(string roomCode, string personId)
@@ -64,8 +66,28 @@ namespace GameLogic
             var random = new Random();
             var chameleons = room.PersonIds.OrderBy(x => random.Next())
                 .ToArray()
-                .Take(GetChameleonCount(room.PersonIds.Count));
-            _roomStore.StartGame(roomCode, word, chameleons);
+                .Take(GetChameleonCount(room.PersonIds.Count))
+                .ToHashSet();
+
+            var goesFirst = PickFirstPlayer(room.PersonIds, chameleons);
+            _roomStore.StartGame(roomCode, word, chameleons, goesFirst);
+        }
+
+        private static string PickFirstPlayer(IReadOnlyCollection<string> personIds, ISet<string> chameleons)
+        {
+            var weightedPersonIds = new List<string>();
+            
+            foreach (var personId in personIds)
+            {
+                var weight = chameleons.Contains(personId) ? 3 : 10;
+                for (var i = 0; i < weight; i++)
+                {
+                    weightedPersonIds.Add(personId);
+                }
+            }
+            
+            var randomIndex = new Random().Next(weightedPersonIds.Count);
+            return weightedPersonIds[randomIndex];
         }
 
         public void LeaveRoom(string roomCode, string personId)
