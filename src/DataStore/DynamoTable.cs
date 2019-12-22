@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon;
@@ -36,6 +37,7 @@ namespace DataStore
         {
             var table = GetTable();
             var roomJson = JsonConvert.SerializeObject(room.GetDynamoModel());
+            room.LastModified = DateTimeOffset.Now.ToUnixTimeSeconds();
             Document doc = Document.FromJson(roomJson);
             Task putItem = table.PutItemAsync(doc);
             putItem.Wait();
