@@ -21,8 +21,11 @@ namespace DataStore
 
         public IReadOnlyCollection<string> PersonIds => _dynamoModel.PersonByPersonId.Keys;
 
-        public DateTime LastModified => _dynamoModel.LastModified;
-
+        public long LastModified
+        {
+            get => _dynamoModel.LastModified;
+            set => _dynamoModel.LastModified = value;
+        }
         public string GetNameFor(string personId)
         {
             return _dynamoModel.PersonByPersonId[personId].Name;
@@ -57,7 +60,7 @@ namespace DataStore
         {
             public string RoomCode { get; set; }
             public Dictionary<string, Person> PersonByPersonId { get; set; } = new Dictionary<string, Person>();
-            public DateTime LastModified { get; set; }
+            public long LastModified { get; set; }
 
             internal class Person
             {
