@@ -4,7 +4,7 @@ namespace GameLogic
 {
     public class RoomStatus
     {
-        public RoomStatus(string code, string name, int peopleCount, int chameleonCount, string state, string character)
+        public RoomStatus(string code, string name, int peopleCount, int chameleonCount, string state, string character, DateTime stopPollingAfter)
         {
             Code = code;
             Name = name;
@@ -13,8 +13,10 @@ namespace GameLogic
             State = state;
             Character = character;
             TimeToPollMillisecond = 5000;
+            StopPollingAfter = stopPollingAfter;
         }
 
+        public DateTime StopPollingAfter { get; set; }
         public string Name { get; set; }
         public string Code { get; }
         public int PeopleCount { get; }
@@ -33,12 +35,13 @@ namespace GameLogic
                    ChameleonCount == status.ChameleonCount &&
                    State == status.State &&
                    Character == status.Character &&
-                   TimeToPollMillisecond == status.TimeToPollMillisecond;
+                   TimeToPollMillisecond == status.TimeToPollMillisecond &&
+                   StopPollingAfter == status.StopPollingAfter;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Code, PeopleCount, ChameleonCount, State, Character, TimeToPollMillisecond);
+            return HashCode.Combine(Code, PeopleCount, ChameleonCount, State, Character, TimeToPollMillisecond, StopPollingAfter);
         }
     }
 }
