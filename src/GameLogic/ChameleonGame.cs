@@ -40,7 +40,7 @@ namespace GameLogic
         public RoomStatus GetRoomStatus(string roomCode, string personId)
         {
             var room = _roomStore.GetRoom(roomCode);
-            EnsurePersonInRoom(roomCode, personId, room);
+            ThrowUnlessPersonInRoom(roomCode, personId, room);
 
             var name = room.GetNameFor(personId);
             var peopleCount = room.PersonIds.Count;
@@ -58,7 +58,7 @@ namespace GameLogic
         public void StartGame(string roomCode, string personId)
         {
             var room = _roomStore.GetRoom(roomCode);
-            EnsurePersonInRoom(roomCode, personId, room);
+            ThrowUnlessPersonInRoom(roomCode, personId, room);
             var word = new Words().GetRandomWord();
 
             var random = new Random();
@@ -71,11 +71,11 @@ namespace GameLogic
         public void LeaveRoom(string roomCode, string personId)
         {
             var room = _roomStore.GetRoom(roomCode);
-            EnsurePersonInRoom(roomCode, personId, room);
+            ThrowUnlessPersonInRoom(roomCode, personId, room);
             _roomStore.RemovePersonFromRoom(roomCode, personId);
         }
 
-        private static void EnsurePersonInRoom(string roomCode, string personId, Room room)
+        private static void ThrowUnlessPersonInRoom(string roomCode, string personId, Room room)
         {
             if (!room.PersonIds.Contains(personId))
             {
