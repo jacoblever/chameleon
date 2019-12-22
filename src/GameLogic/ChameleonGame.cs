@@ -45,7 +45,7 @@ namespace GameLogic
             var name = room.GetNameFor(personId);
             var peopleCount = room.PersonIds.Count;
             var myCharacter = room.GetCharacterFor(personId);
-            var stopPollingAfter = room.LastModified.AddSeconds(300);
+            var stopPollingAfter = room.LastModified + 300;
 
             return new RoomStatus(
                 code: roomCode,
