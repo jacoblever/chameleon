@@ -45,6 +45,7 @@ namespace GameLogic
             var name = room.GetNameFor(personId);
             var peopleCount = room.PersonIds.Count;
             var myCharacter = room.GetCharacterFor(personId);
+            var stopPollingAfter = room.LastModified.AddSeconds(300);
 
             return new RoomStatus(
                 code: roomCode,
@@ -52,7 +53,8 @@ namespace GameLogic
                 peopleCount: peopleCount,
                 chameleonCount: GetChameleonCount(peopleCount),
                 state: myCharacter == null ? RoomState.PreGame.ToString() : RoomState.InGame.ToString(),
-                character: myCharacter);
+                character: myCharacter,
+                stopPollingAfter: stopPollingAfter);
         }
 
         public void StartGame(string roomCode, string personId)
