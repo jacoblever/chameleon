@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
+using DataStore;
 using GameLogic;
 using Newtonsoft.Json;
 
@@ -53,6 +54,15 @@ namespace ChameleonJoinRoomFunction
                 return new APIGatewayProxyResponse
                 {
                     StatusCode = 404,
+                    Body = e.Message,
+                    Headers = headers,
+                };
+            }
+            catch (PersonNameNotUniqueException e)
+            {
+                return new APIGatewayProxyResponse
+                {
+                    StatusCode = 409,
                     Body = e.Message,
                     Headers = headers,
                 };
