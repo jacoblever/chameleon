@@ -56,10 +56,24 @@ namespace DataStore
         public string CreatePersonInRoom(string roomCode, string personName)
         {
             var room = GetRoom(roomCode);
+            ThrowIfPersonNameNotUnique(room, personName);
             var personId = Guid.NewGuid().ToString();
             room.AddPerson(personId, personName);
             _dynamoTable.SaveRoom(room);
             return personId;
+        }
+
+        private static void ThrowIfPersonNameNotUnique(Room room, string personName)
+        {
+            var nameClash = room.PersonIds
+                .Any(x => string.Equals(
+                    room.GetNameFor(x),
+                    personName,
+                    StringComparison.InvariantCultureIgnoreCase));
+            if (nameClash)
+            {
+                throw new PersonNameNotUniqueException(personName);
+            }
         }
 
         public void StartGame(string roomCode, string word, ISet<string> chameleons, string firstPersonId)
