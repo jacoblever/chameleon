@@ -18,7 +18,7 @@ namespace ChameleonJoinRoomFunction
             var body = JObject.Parse(requestBody);
             var roomCodeToken = body["RoomCode"];
             var personNameToken = body["PersonName"];
-            var personName = personNameToken?.ToString() ?? "";
+            var personName = personNameToken?.ToString().Trim() ?? "";
             if (personName.Length == 0)
             {
                 throw new PersonNameMustBeSpecifiedException();
@@ -31,7 +31,7 @@ namespace ChameleonJoinRoomFunction
             }
             else
             {
-                var roomCode = roomCodeToken.ToString();
+                var roomCode = roomCodeToken.ToString().Trim();
                 if (!Regex.IsMatch(roomCode, "[A-Z]{4}"))
                 {
                     throw new RoomCodeMustBeValidException();
