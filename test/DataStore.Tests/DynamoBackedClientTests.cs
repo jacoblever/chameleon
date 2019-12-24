@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using NUnit.Framework;
 
 namespace DataStore.Tests
@@ -7,6 +8,17 @@ namespace DataStore.Tests
     [Category("DynamoTests")]
     public class DynamoBackedClientTests
     {
+        private const string DynamoDbTableNameEnvVar = "DYNAMO_DB_TABLE_NAME";
+        private const string DynamoLocalTableName = "ChameleonData";
+
+        [SetUp]
+        public void SetUp()
+            => Environment.SetEnvironmentVariable(DynamoDbTableNameEnvVar, DynamoLocalTableName);
+
+        [TearDown]
+        public void TearDown()
+            => Environment.SetEnvironmentVariable(DynamoDbTableNameEnvVar, null);
+
         [Test]
         public void TestCanSaveRoom()
         {

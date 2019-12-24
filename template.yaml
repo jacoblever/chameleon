@@ -1,0 +1,110 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Sample SAM Template for chameleon-game
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Api:
+    Cors:
+      AllowMethods: "'OPTIONS,POST,GET'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,x-chameleon-personid'"
+      AllowOrigin: "'*'"
+  Function:
+    Timeout: 30
+    Runtime: dotnetcore2.1
+    Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+      Variables:
+        DYNAMO_DB_TABLE_NAME: !Ref ChameleonDynamoTable
+
+Resources:
+  ChameleonDynamoTable: # The database must defined before the lambda functions
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      AttributeDefinitions: 
+        - AttributeName: RoomCode
+          AttributeType: S
+      KeySchema: 
+        - AttributeName: RoomCode
+          KeyType: HASH
+      ProvisionedThroughput: 
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+  ChameleonJoinRoomFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ./src/ChameleonJoinRoomFunction/
+      Handler: ChameleonJoinRoomFunction::ChameleonJoinRoomFunction.Function::FunctionHandler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ChameleonDynamoTable
+      Events:
+        JoinRoom:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /api/join-room
+            Method: post
+  ChameleonGetRoomStatusFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/ChameleonGetRoomStatusFunction/
+      Handler: ChameleonGetRoomStatusFunction::ChameleonGetRoomStatusFunction.Function::FunctionHandler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ChameleonDynamoTable
+      Events:
+        RoomStatus:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /api/room-status
+            Method: get
+  ChameleonStartGameFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/ChameleonStartGameFunction/
+      Handler: ChameleonStartGameFunction::ChameleonStartGameFunction.Function::FunctionHandler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ChameleonDynamoTable
+      Events:
+        StartGame:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /api/start-game
+            Method: post
+  ChameleonLeaveRoomFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/ChameleonLeaveRoomFunction/
+      Handler: ChameleonLeaveRoomFunction::ChameleonLeaveRoomFunction.Function::FunctionHandler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ChameleonDynamoTable
+      Events:
+        LeaveRoom:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /api/leave-room
+            Method: post
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  ChameleonJoinRoomApi:
+    Description: "API Gateway endpoint URL for Prod stage for Join Room function"
+    Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  ChameleonJoinRoomFunction:
+    Description: "Join Room Lambda Function ARN"
+    Value: !GetAtt ChameleonJoinRoomFunction.Arn
+  ChameleonJoinRoomFunctionIamRole:
+    Description: "Implicit IAM Role created for Join Room function"
+    Value: !GetAtt ChameleonJoinRoomFunctionRole.Arn
