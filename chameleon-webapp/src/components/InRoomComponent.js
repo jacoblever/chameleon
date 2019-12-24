@@ -9,6 +9,7 @@ class InRoomComponent extends React.Component {
       numberOfChameleonsInRoom: null,
       roomState: null,
       character: null,
+      firstPersonId: null,
       polling: true,
     };
 
@@ -38,6 +39,7 @@ class InRoomComponent extends React.Component {
           numberOfChameleonsInRoom: jsonBody.ChameleonCount,
           roomState: jsonBody.State,
           character: jsonBody.Character,
+          firstPersonId: jsonBody.FirstPersonId,
         });
         if (jsonBody.TimeToPollMillisecond) {
           setTimeout(this.poll, jsonBody.TimeToPollMillisecond);
@@ -95,6 +97,7 @@ class InRoomComponent extends React.Component {
                 ) : (
                   <div>The word is '{this.state.character}'</div>
                 )}
+                <div>{this.state.firstPersonId} goes first</div>
                 <button onClick={this.startGame}>Start New Game</button>
               </div>
             )}
