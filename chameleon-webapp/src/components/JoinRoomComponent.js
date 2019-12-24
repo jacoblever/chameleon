@@ -25,7 +25,7 @@ class JoinRoomComponent extends React.Component {
   }
 
   makeJoinRoomRequest(roomCode, personName) {
-    fetch(process.env.REACT_APP_CHAMELEON_BACKEND_BASE_URL + '/api/join-room/', {
+    fetch(process.env.REACT_APP_CHAMELEON_BACKEND_BASE_URL + '/api-2/join-room/', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
