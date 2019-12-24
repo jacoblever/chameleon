@@ -94,6 +94,21 @@ Resources:
             RestApiId: !Ref ApiGatewayApi
             Path: /api/leave-room
             Method: post
+  ChameleonFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/ChameleonFunction/
+      Handler: ChameleonFunction::ChameleonFunction.Function::FunctionHandler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ChameleonDynamoTable
+      Events:
+        AnyApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /api-2/{proxy+}
+            Method: any
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
