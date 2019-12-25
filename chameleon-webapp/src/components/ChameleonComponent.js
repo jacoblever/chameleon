@@ -10,9 +10,16 @@ class ChameleonComponent extends React.Component {
       roomCode: Cookies.get('roomCode'),
       personId: Cookies.get('personId')
     };
+    this.warmUpBackend();
 
     this.onRoomJoined = this.onRoomJoined.bind(this);
     this.onRoomLeft = this.onRoomLeft.bind(this);
+  }
+
+  warmUpBackend() {
+    fetch(process.env.REACT_APP_CHAMELEON_BACKEND_BASE_URL + '/api-2/warm-up', {
+      method: 'GET',
+    })
   }
 
   onRoomJoined(roomCode, personId) {
