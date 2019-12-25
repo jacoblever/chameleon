@@ -27,7 +27,7 @@ class InRoomComponent extends React.Component {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
-        'X-Chameleon-PersonId': this.props.personId,
+        'x-chameleon-personid': this.props.personId,
       }
     })
       .then(response => response.json())
@@ -51,7 +51,7 @@ class InRoomComponent extends React.Component {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
-        'X-Chameleon-PersonId': this.props.personId,
+        'x-chameleon-personid': this.props.personId,
       }
     })
     .catch((error) => { console.error(error); });
@@ -63,7 +63,7 @@ class InRoomComponent extends React.Component {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
-        'X-Chameleon-PersonId': this.props.personId,
+        'x-chameleon-personid': this.props.personId,
       }
     })
     .then(() => this.props.onRoomLeft())
