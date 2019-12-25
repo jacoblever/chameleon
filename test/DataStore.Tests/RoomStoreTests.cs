@@ -100,7 +100,7 @@ namespace DataStore.Tests
             
             var roomStore = RoomStore.Create(dynamoTable.Object);
 
-            roomStore.StartGame(roomCode, word, new List<string> {"person-1"});
+            roomStore.StartGame(roomCode, word, new HashSet<string> {"person-1"}, "person-2");
             
             var expectedRoom = new Room();
             expectedRoom.AddPerson("person-1", "jacob");

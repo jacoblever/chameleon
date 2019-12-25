@@ -76,9 +76,8 @@ namespace DataStore
             }
         }
 
-        public void StartGame(string roomCode, string word, IEnumerable<string> chameleons)
+        public void StartGame(string roomCode, string word, ISet<string> chameleons, string firstPersonId)
         {
-            chameleons = chameleons.ToList();
             var room = GetRoom(roomCode);
             foreach (var personId in room.PersonIds.Select(x => x).ToList())
             {
@@ -87,6 +86,7 @@ namespace DataStore
                         ? "chameleon"
                         : word);
             }
+            room.SetGoesFirst(firstPersonId);
             _dynamoTable.SaveRoom(room);
         }
 

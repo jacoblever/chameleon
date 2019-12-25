@@ -4,7 +4,14 @@ namespace GameLogic
 {
     public class RoomStatus
     {
-        public RoomStatus(string code, string name, int peopleCount, int chameleonCount, string state, string character)
+        public RoomStatus(
+            string code,
+            string name,
+            int peopleCount,
+            int chameleonCount,
+            string state,
+            string character,
+            string firstPersonName)
         {
             Code = code;
             Name = name;
@@ -12,6 +19,7 @@ namespace GameLogic
             ChameleonCount = chameleonCount;
             State = state;
             Character = character;
+            FirstPersonName = firstPersonName;
             TimeToPollMillisecond = 5000;
         }
 
@@ -21,7 +29,8 @@ namespace GameLogic
         public int ChameleonCount { get; }
         public string State { get; }
         public string Character { get; }
-        
+        public string FirstPersonName { get; }
+
         // TODO: This is a very UI thing and so does not belong in Game Logic
         public int TimeToPollMillisecond { get; }
 
