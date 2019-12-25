@@ -59,7 +59,7 @@ namespace DataStore
 
         public string WhoGoesFirst()
         {
-            return _dynamoModel.PersonByPersonId.Single(x => x.Value.GoesFirst).Key;
+            return _dynamoModel.PersonByPersonId.Single(x => x.Value.GoesFirst).Value.Name;
         }
 
         internal DynamoModel GetDynamoModel()
