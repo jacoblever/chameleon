@@ -54,7 +54,7 @@ namespace GameLogic
                 chameleonCount: GetChameleonCount(peopleCount),
                 state: myCharacter == null ? RoomState.PreGame.ToString() : RoomState.InGame.ToString(),
                 character: myCharacter,
-                firstPersonId: room.WhoGoesFirst());
+                firstPersonName: room.WhoGoesFirst());
         }
 
         public void StartGame(string roomCode, string personId)
