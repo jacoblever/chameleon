@@ -2,6 +2,7 @@ import React from 'react';
 import JoinRoomComponent from './JoinRoomComponent';
 import InRoomComponent from './InRoomComponent';
 import Cookies from 'js-cookie';
+import Config from '../Config'
 
 class ChameleonComponent extends React.Component {
   constructor(props) {
@@ -17,7 +18,7 @@ class ChameleonComponent extends React.Component {
   }
 
   warmUpBackend() {
-    fetch(process.env.REACT_APP_CHAMELEON_BACKEND_BASE_URL + '/api-2/warm-up', {
+    fetch(Config.backendBaseApiUrl() + 'warm-up', {
       method: 'GET',
     })
   }
