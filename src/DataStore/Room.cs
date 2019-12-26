@@ -53,13 +53,14 @@ namespace DataStore
         {
             foreach (var id in _dynamoModel.PersonByPersonId.Keys)
             {
-                _dynamoModel.PersonByPersonId[personId].GoesFirst = id == personId;
+                _dynamoModel.PersonByPersonId[id].GoesFirst = id == personId;
             }
         }
 
         public string WhoGoesFirstByName()
         {
-            return _dynamoModel.PersonByPersonId.Single(x => x.Value.GoesFirst).Value.Name;
+            var firstPerson = _dynamoModel.PersonByPersonId.SingleOrDefault(x => x.Value.GoesFirst);
+            return firstPerson.Value?.Name;
         }
 
         internal DynamoModel GetDynamoModel()
