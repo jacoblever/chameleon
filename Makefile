@@ -19,6 +19,11 @@ test:
 test_not_dynamo:
 	dotnet test --filter TestCategory!=DynamoTests
 
+.PHONY: run_backend
+run_backend:
+	sam build
+	sam local start-api
+
 .PHONY: dynamo_server
 dynamo_server:
 	@echo "Running local dynamo server"

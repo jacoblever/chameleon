@@ -1,4 +1,5 @@
 import React from 'react';
+import Config from '../Config'
 
 class JoinRoomComponent extends React.Component {
   constructor(props) {
@@ -25,7 +26,7 @@ class JoinRoomComponent extends React.Component {
   }
 
   makeJoinRoomRequest(roomCode, personName) {
-    fetch(process.env.REACT_APP_CHAMELEON_BACKEND_BASE_URL + '/api/join-room/', {
+    fetch(Config.backendBaseApiUrl() + 'join-room/', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
