@@ -33,14 +33,13 @@ namespace DataStore
             return new Room(dynamoModel);
         }
 
-        public string SaveRoom(Room room)
+        public void SaveRoom(Room room)
         {
             var table = GetTable();
             var roomJson = JsonConvert.SerializeObject(room.GetDynamoModel());
             Document doc = Document.FromJson(roomJson);
             Task putItem = table.PutItemAsync(doc);
             putItem.Wait();
-            return "Done!";
         }
         
         private Table GetTable()
