@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using DataStore;
 
@@ -40,7 +41,7 @@ namespace GameLogic
         public RoomStatus GetRoomStatus(string roomCode, string personId)
         {
             var room = _roomStore.GetRoom(roomCode);
-            EnsurePersonInRoom(roomCode, personId, room);
+            ThrowUnlessPersonInRoom(roomCode, personId, room);
 
             var name = room.GetNameFor(personId);
             var peopleCount = room.PersonIds.Count;
@@ -54,30 +55,51 @@ namespace GameLogic
                 chameleonCount: GetChameleonCount(peopleCount),
                 state: myCharacter == null ? RoomState.PreGame.ToString() : RoomState.InGame.ToString(),
                 character: myCharacter,
-                stopPollingAfter: stopPollingAfter);
+                stopPollingAfter: stopPollingAfter, 
+                firstPersonName: myCharacter == null ? null : room.WhoGoesFirstByName());
         }
 
         public void StartGame(string roomCode, string personId)
         {
             var room = _roomStore.GetRoom(roomCode);
-            EnsurePersonInRoom(roomCode, personId, room);
+            ThrowUnlessPersonInRoom(roomCode, personId, room);
             var word = new Words().GetRandomWord();
 
             var random = new Random();
             var chameleons = room.PersonIds.OrderBy(x => random.Next())
                 .ToArray()
-                .Take(GetChameleonCount(room.PersonIds.Count));
-            _roomStore.StartGame(roomCode, word, chameleons);
+                .Take(GetChameleonCount(room.PersonIds.Count))
+                .ToHashSet();
+
+            var goesFirst = PickFirstPlayer(room.PersonIds, chameleons);
+            _roomStore.StartGame(roomCode, word, chameleons, goesFirst);
+        }
+
+        private static string PickFirstPlayer(IReadOnlyCollection<string> personIds, ISet<string> chameleons)
+        {
+            var weightedPersonIds = new List<string>();
+            
+            foreach (var personId in personIds)
+            {
+                var weight = chameleons.Contains(personId) ? 3 : 10;
+                for (var i = 0; i < weight; i++)
+                {
+                    weightedPersonIds.Add(personId);
+                }
+            }
+            
+            var randomIndex = new Random().Next(weightedPersonIds.Count);
+            return weightedPersonIds[randomIndex];
         }
 
         public void LeaveRoom(string roomCode, string personId)
         {
             var room = _roomStore.GetRoom(roomCode);
-            EnsurePersonInRoom(roomCode, personId, room);
+            ThrowUnlessPersonInRoom(roomCode, personId, room);
             _roomStore.RemovePersonFromRoom(roomCode, personId);
         }
 
-        private static void EnsurePersonInRoom(string roomCode, string personId, Room room)
+        private static void ThrowUnlessPersonInRoom(string roomCode, string personId, Room room)
         {
             if (!room.PersonIds.Contains(personId))
             {

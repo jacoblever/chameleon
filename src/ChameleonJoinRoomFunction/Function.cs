@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
+using DataStore;
 using GameLogic;
 using Newtonsoft.Json;
 
@@ -14,6 +15,10 @@ namespace ChameleonJoinRoomFunction
     {
         public APIGatewayProxyResponse FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
         {
+            var headers = new Dictionary<string, string>
+            {
+                { "Access-Control-Allow-Origin", "*" },
+            };
             try
             {
                 var chameleonGame = ChameleonGame.Create();
@@ -23,10 +28,25 @@ namespace ChameleonJoinRoomFunction
                 {
                     StatusCode = 200,
                     Body = JsonConvert.SerializeObject(person),
-                    Headers = new Dictionary<string, string>
-                    {
-                        { "Access-Control-Allow-Origin", "*" },
-                    },
+                    Headers = headers,
+                };
+            }
+            catch (PersonNameMustBeSpecifiedException e)
+            {
+                return new APIGatewayProxyResponse
+                {
+                    StatusCode = 400,
+                    Body = e.Message,
+                    Headers = headers,
+                };
+            }
+            catch (RoomCodeMustBeValidException e)
+            {
+                return new APIGatewayProxyResponse
+                {
+                    StatusCode = 400,
+                    Body = e.Message,
+                    Headers = headers,
                 };
             }
             catch (RoomDoesNotExistException e)
@@ -35,10 +55,16 @@ namespace ChameleonJoinRoomFunction
                 {
                     StatusCode = 404,
                     Body = e.Message,
-                    Headers = new Dictionary<string, string>
-                    {
-                        { "Access-Control-Allow-Origin", "*" },
-                    },
+                    Headers = headers,
+                };
+            }
+            catch (PersonNameNotUniqueException e)
+            {
+                return new APIGatewayProxyResponse
+                {
+                    StatusCode = 409,
+                    Body = e.Message,
+                    Headers = headers,
                 };
             }
             catch (Exception e)
@@ -47,10 +73,7 @@ namespace ChameleonJoinRoomFunction
                 {
                     StatusCode = 500,
                     Body = $"{e.Message}\n{e.StackTrace}",
-                    Headers = new Dictionary<string, string>
-                    {
-                        { "Access-Control-Allow-Origin", "*" },
-                    },
+                    Headers = headers,
                 };
             }
         }

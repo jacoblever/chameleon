@@ -1,4 +1,5 @@
 import React from 'react';
+import Config from '../Config'
 
 class JoinRoomComponent extends React.Component {
   constructor(props) {
@@ -10,6 +11,7 @@ class JoinRoomComponent extends React.Component {
 
     this.handleRoomChange = this.handleRoomChange.bind(this);
     this.handlePersonChange = this.handlePersonChange.bind(this);
+    this.handleRoomCodeKeyUp = this.handleRoomCodeKeyUp.bind(this);
     this.createRoom = this.createRoom.bind(this);
     this.joinRoom = this.joinRoom.bind(this);
     this.makeJoinRoomRequest = this.makeJoinRoomRequest.bind(this);
@@ -24,15 +26,15 @@ class JoinRoomComponent extends React.Component {
   }
 
   makeJoinRoomRequest(roomCode, personName) {
-    fetch(process.env.REACT_APP_CHAMELEON_BACKEND_BASE_URL + '/api/join-room/', {
+    fetch(Config.backendBaseApiUrl() + 'join-room/', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        roomCode: roomCode,
-        personName: personName,
+        RoomCode: roomCode,
+        PersonName: personName,
       })
     })
       .then(response => response.json())
@@ -48,14 +50,31 @@ class JoinRoomComponent extends React.Component {
     this.setState({personNameInput: event.target.value});
   }
 
+  handleRoomCodeKeyUp(event) {
+    if (event.keyCode === 13) { // enter key
+      this.makeJoinRoomRequest(this.state.roomCodeInput, this.state.personNameInput);
+      event.preventDefault();
+    }
+  }
+
   render() {
     return (
       <div>
-        <input type="text" value={this.state.personNameInput} onChange={this.handlePersonChange} />
+        <input
+          type="text"
+          value={this.state.personNameInput}
+          onChange={this.handlePersonChange}
+          placeholder="Enter your name" />
         <br/>
-        <button onClick={this.createRoom}>Create Room</button>        
+        <button onClick={this.createRoom}>Create Room</button>
+        <br /> or <br />
+        <input
+          type="text"
+          value={this.state.roomCodeInput}
+          onChange={this.handleRoomChange}
+          onKeyUp={this.handleRoomCodeKeyUp}
+          placeholder="Enter 4 letter room code" />
         <button onClick={this.joinRoom}>Join Room</button>
-        <input type="text" value={this.state.roomCodeInput} onChange={this.handleRoomChange} />
       </div>
     );
   }

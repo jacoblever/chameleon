@@ -2,6 +2,7 @@ import React from 'react';
 import JoinRoomComponent from './JoinRoomComponent';
 import InRoomComponent from './InRoomComponent';
 import Cookies from 'js-cookie';
+import Config from '../Config'
 
 class ChameleonComponent extends React.Component {
   constructor(props) {
@@ -10,9 +11,16 @@ class ChameleonComponent extends React.Component {
       roomCode: Cookies.get('roomCode'),
       personId: Cookies.get('personId')
     };
+    this.warmUpBackend();
 
     this.onRoomJoined = this.onRoomJoined.bind(this);
     this.onRoomLeft = this.onRoomLeft.bind(this);
+  }
+
+  warmUpBackend() {
+    fetch(Config.backendBaseApiUrl() + 'warm-up', {
+      method: 'GET',
+    })
   }
 
   onRoomJoined(roomCode, personId) {

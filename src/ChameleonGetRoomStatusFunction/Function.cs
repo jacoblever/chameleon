@@ -1,3 +1,4 @@
+using System;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.APIGatewayEvents;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace ChameleonGetRoomStatusFunction
         public APIGatewayProxyResponse FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
         {
             var roomCode = request.QueryStringParameters["RoomCode"];
-            var personId = request.Headers[@"x-chameleon-personid"];
+            var personId = GetPersonId(request);
 
             try
             {
@@ -42,6 +43,20 @@ namespace ChameleonGetRoomStatusFunction
                     },
                 };
             }
+        }
+
+        private static string GetPersonId(APIGatewayProxyRequest request)
+        {
+            if (request.Headers.TryGetValue("x-chameleon-personid", out var personId))
+            {
+                return personId;
+            }
+            if (request.Headers.TryGetValue("X-Chameleon-Personid", out personId))
+            {
+                return personId;
+            }
+
+            return "";
         }
     }
 }
