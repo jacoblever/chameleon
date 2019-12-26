@@ -9,7 +9,7 @@ namespace GameLogic.Tests
         [Test]
         public void CanPlayGame()
         {
-            var chameleonGame = ChameleonGame.Create(RoomStore.Create(new FakeDynamoTable()));
+            var chameleonGame = ChameleonGame.Create(RoomStore.Create(new InMemoryDynamoTable()));
 
             // Creating and joining the room
             var personAndRoom = chameleonGame.CreateRoom("Anita");
