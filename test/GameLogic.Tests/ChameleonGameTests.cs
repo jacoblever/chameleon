@@ -76,11 +76,12 @@ namespace GameLogic.Tests
             mockRoomStore.Setup(x => x.GetRoom(roomCode)).Returns(room);
             
             chameleonGame.StartGame(roomCode, "person-1");
-            
+
             mockRoomStore.Verify(x => x.StartGame(
-                roomCode, 
-                It.IsAny<string>(), 
-                It.Is<IEnumerable<string>>(y => y.Count() == 1)));
+                roomCode,
+                It.IsAny<string>(),
+                It.Is<ISet<string>>(y => y.Count() == 1),
+                It.Is<string>(y => y.StartsWith("person-"))));
         }
     }
 }

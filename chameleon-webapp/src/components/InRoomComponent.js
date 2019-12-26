@@ -1,4 +1,5 @@
 import React from 'react';
+import Config from '../Config'
 
 class InRoomComponent extends React.Component {
   constructor(props) {
@@ -9,6 +10,7 @@ class InRoomComponent extends React.Component {
       numberOfChameleonsInRoom: null,
       roomState: null,
       character: null,
+      firstPersonName: null,
       polling: true,
     };
 
@@ -23,11 +25,11 @@ class InRoomComponent extends React.Component {
     if(!this.state.polling) {
       return
     }
-    fetch(process.env.REACT_APP_CHAMELEON_BACKEND_BASE_URL + '/api/room-status/?RoomCode=' + this.props.roomCode, {
+    fetch(Config.backendBaseApiUrl() + 'room-status/?RoomCode=' + this.props.roomCode, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
-        'X-Chameleon-PersonId': this.props.personId,
+        [Config.personIdHeader()]: this.props.personId,
       }
     })
       .then(response => response.json())
@@ -38,6 +40,7 @@ class InRoomComponent extends React.Component {
           numberOfChameleonsInRoom: jsonBody.ChameleonCount,
           roomState: jsonBody.State,
           character: jsonBody.Character,
+          firstPersonName: jsonBody.FirstPersonName,
         });
         if (jsonBody.TimeToPollMillisecond) {
           setTimeout(this.poll, jsonBody.TimeToPollMillisecond);
@@ -47,11 +50,11 @@ class InRoomComponent extends React.Component {
   }
 
   startGame(e) {
-    fetch(process.env.REACT_APP_CHAMELEON_BACKEND_BASE_URL + '/api/start-game/?RoomCode=' + this.props.roomCode, {
+    fetch(Config.backendBaseApiUrl() + 'start-game/?RoomCode=' + this.props.roomCode, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
-        'X-Chameleon-PersonId': this.props.personId,
+        [Config.personIdHeader()]: this.props.personId,
       }
     })
     .catch((error) => { console.error(error); });
@@ -59,11 +62,11 @@ class InRoomComponent extends React.Component {
 
   leaveRoom(e) {
     this.setState({polling: false});
-    fetch(process.env.REACT_APP_CHAMELEON_BACKEND_BASE_URL + '/api/leave-room/?RoomCode=' + this.props.roomCode, {
+    fetch(Config.backendBaseApiUrl() + 'leave-room/?RoomCode=' + this.props.roomCode, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
-        'X-Chameleon-PersonId': this.props.personId,
+        [Config.personIdHeader()]: this.props.personId,
       }
     })
     .then(() => this.props.onRoomLeft())
@@ -95,6 +98,7 @@ class InRoomComponent extends React.Component {
                 ) : (
                   <div>The word is '{this.state.character}'</div>
                 )}
+                <div>{this.state.firstPersonName} goes first</div>
                 <button onClick={this.startGame}>Start New Game</button>
               </div>
             )}

@@ -45,4 +45,8 @@ Thumbs.db
 # dotCover
 *.dotCover
 
+# IntelliJ IDE files
 .idea/*
+
+# Generated aws sam build files
+.aws-sam/*

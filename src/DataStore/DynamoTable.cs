@@ -33,7 +33,7 @@ namespace DataStore
             return new Room(dynamoModel);
         }
 
-        public string SaveRoom(Room room)
+        public void SaveRoom(Room room)
         {
             var table = GetTable();
             var roomJson = JsonConvert.SerializeObject(room.GetDynamoModel());
@@ -41,7 +41,6 @@ namespace DataStore
             Document doc = Document.FromJson(roomJson);
             Task putItem = table.PutItemAsync(doc);
             putItem.Wait();
-            return "Done!";
         }
         
         private Table GetTable()
@@ -52,9 +51,10 @@ namespace DataStore
         
         private Table GetOrCreateTable(AmazonDynamoDBClient client)
         {
-            if (!Table.TryLoadTable(client, "ChameleonData", out var table))
+            var tableName = Environment.GetEnvironmentVariable("DYNAMO_DB_TABLE_NAME");
+            if (!Table.TryLoadTable(client, tableName, out var table))
             {
-                var task = client.CreateTableAsync("ChameleonData", new List<KeySchemaElement>
+                var task = client.CreateTableAsync(tableName, new List<KeySchemaElement>
                     {
                         new KeySchemaElement("RoomCode", KeyType.HASH),
                     },
@@ -65,7 +65,7 @@ namespace DataStore
                     new ProvisionedThroughput(1, 1)
                 );
                 task.Wait();
-                table = Table.LoadTable(client, "ChameleonData");
+                table = Table.LoadTable(client, tableName);
             }
 
             return table;
