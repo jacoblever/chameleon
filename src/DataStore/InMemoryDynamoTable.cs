@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace DataStore
 {
-    public class FakeDynamoTable : IDynamoTable
+    public class InMemoryDynamoTable : IDynamoTable
     {
         private readonly Dictionary<string, string> _rooms = new Dictionary<string, string>();
 
