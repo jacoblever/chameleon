@@ -11,7 +11,10 @@ class InRoomComponent extends React.Component {
       roomState: null,
       character: null,
       firstPersonName: null,
+      stopPollingAfter: Infinity,
+      timeToPollMillisecond: null,
       polling: true,
+      roomOld: false,
     };
 
     this.poll = this.poll.bind(this);
@@ -22,8 +25,13 @@ class InRoomComponent extends React.Component {
   }
 
   poll() {
-    if(!this.state.polling) {
-      return
+    console.log(`Will stop polling in: ${this.state.stopPollingAfter - this.nowAsUnixTimestampUtc()}s`);
+    if (this.nowAsUnixTimestampUtc() > this.state.stopPollingAfter) {
+      this.setState({ polling: false, roomOld: true });
+      return;
+    }
+    if (!this.state.polling) {
+      return;
     }
     fetch(Config.backendBaseApiUrl() + 'room-status/?RoomCode=' + this.props.roomCode, {
       method: 'GET',
@@ -41,12 +49,21 @@ class InRoomComponent extends React.Component {
           roomState: jsonBody.State,
           character: jsonBody.Character,
           firstPersonName: jsonBody.FirstPersonName,
+          stopPollingAfter: jsonBody.StopPollingAfter,
+          timeToPollMillisecond: jsonBody.TimeToPollMillisecond,
         });
         if (jsonBody.TimeToPollMillisecond) {
           setTimeout(this.poll, jsonBody.TimeToPollMillisecond);
         }
       })
-      .catch((error) => { console.error(error); })
+      .catch((error) => {
+        console.error(error);
+        // If we've had at least one successful response, and so this error
+        // was probably just a one off, still try again.
+        if (this.state.timeToPollMillisecond) {
+          setTimeout(this.poll, this.state.timeToPollMillisecond);
+        }
+      })
   }
 
   startGame(e) {
@@ -72,6 +89,10 @@ class InRoomComponent extends React.Component {
     .then(() => this.props.onRoomLeft())
     .catch((error) => { console.error(error); });
   }
+
+  nowAsUnixTimestampUtc() {
+    return Math.floor((new Date()).getTime() / 1000);
+  }
   
   render() {
     return (
@@ -80,6 +101,9 @@ class InRoomComponent extends React.Component {
           <div>Loading...</div>
         ) : (
           <div>
+            {this.state.roomOld && 
+              <div>Still playing? <a href={window.location}>Refresh</a></div>
+            }
             Welcome {this.state.name} to room {this.props.roomCode}.
             <br />
             <div>There are {this.state.numberOfPeopleInRoom} people in the room, {this.state.numberOfChameleonsInRoom} of them are Chameleons!</div>
