@@ -1,4 +1,6 @@
-using System;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace GameLogic
 {
@@ -11,8 +13,7 @@ namespace GameLogic
             int chameleonCount,
             string state,
             string character,
-            string firstPersonName,
-            long stopPollingAfter)
+            string firstPersonName)
         {
             Code = code;
             Name = name;
@@ -21,7 +22,6 @@ namespace GameLogic
             State = state;
             Character = character;
             FirstPersonName = firstPersonName;
-            StopPollingAfter = stopPollingAfter;
             TimeToPollMillisecond = 5000;
         }
 
@@ -32,26 +32,26 @@ namespace GameLogic
         public string State { get; }
         public string Character { get; }
         public string FirstPersonName { get; }
-        public long StopPollingAfter { get; }
 
         // TODO: This is a very UI thing and so does not belong in Game Logic
         public int TimeToPollMillisecond { get; }
+        public string Hash => GetMd5Hash();
 
-        public override bool Equals(object obj)
+        private string GetMd5Hash()
         {
-            return obj is RoomStatus status &&
-                   Code == status.Code &&
-                   PeopleCount == status.PeopleCount &&
-                   ChameleonCount == status.ChameleonCount &&
-                   State == status.State &&
-                   Character == status.Character &&
-                   TimeToPollMillisecond == status.TimeToPollMillisecond &&
-                   StopPollingAfter == status.StopPollingAfter;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Code, PeopleCount, ChameleonCount, State, Character, TimeToPollMillisecond, StopPollingAfter);
+            var fields = string.Concat(
+                Code,
+                PeopleCount.ToString(),
+                ChameleonCount.ToString(),
+                State,
+                Character,
+                TimeToPollMillisecond.ToString()
+            );
+            var inputBytes = Encoding.ASCII.GetBytes(fields);
+            return MD5.Create()
+                .ComputeHash(inputBytes)
+                .Select(x => x.ToString("X2"))
+                .Concat();
         }
     }
 }
