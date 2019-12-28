@@ -11,8 +11,8 @@ class InRoomComponent extends React.Component {
       roomState: null,
       character: null,
       firstPersonName: null,
-      stopPollingAfter: Infinity,
       timeToPollMillisecond: null,
+      lastStatusHash: null,
       polling: true,
       roomOld: false,
     };
@@ -25,8 +25,11 @@ class InRoomComponent extends React.Component {
   }
 
   poll() {
-    console.log(`Will stop polling in: ${this.state.stopPollingAfter - this.nowAsUnixTimestampUtc()}s`);
-    if (this.nowAsUnixTimestampUtc() > this.state.stopPollingAfter) {
+    const stopPollingSeconds = 100;
+    if (
+      this.state.timeOfLastChangeUtc
+      && this.nowAsUnixTimestampUtc() - this.state.timeOfLastChangeUtc > stopPollingSeconds
+    ) {
       this.setState({ polling: false, roomOld: true });
       return;
     }
@@ -42,6 +45,9 @@ class InRoomComponent extends React.Component {
     })
       .then(response => response.json())
       .then(jsonBody => {
+        if (this.state.lastStatusHash !== jsonBody.Hash) {
+          this.setState({timeOfLastChangeUtc: this.nowAsUnixTimestampUtc()});
+        }
         this.setState({
           name: jsonBody.Name,
           numberOfPeopleInRoom: jsonBody.PeopleCount,
@@ -49,8 +55,8 @@ class InRoomComponent extends React.Component {
           roomState: jsonBody.State,
           character: jsonBody.Character,
           firstPersonName: jsonBody.FirstPersonName,
-          stopPollingAfter: jsonBody.StopPollingAfter,
           timeToPollMillisecond: jsonBody.TimeToPollMillisecond,
+          lastStatusHash: jsonBody.Hash,
         });
         if (jsonBody.TimeToPollMillisecond) {
           setTimeout(this.poll, jsonBody.TimeToPollMillisecond);
