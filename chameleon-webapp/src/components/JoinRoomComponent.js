@@ -1,5 +1,6 @@
 import React from 'react';
 import Config from '../Config'
+import Non200ResponseError from '../Non200ResponseError'
 
 class JoinRoomComponent extends React.Component {
   constructor(props) {
@@ -7,6 +8,7 @@ class JoinRoomComponent extends React.Component {
     this.state = {
       roomCodeInput: '' ,
       personNameInput: '',
+      errorMessage: '',
     };
 
     this.handleRoomChange = this.handleRoomChange.bind(this);
@@ -26,6 +28,7 @@ class JoinRoomComponent extends React.Component {
   }
 
   makeJoinRoomRequest(roomCode, personName) {
+    this.setState({ errorMessage: '' });
     fetch(Config.backendBaseApiUrl() + 'join-room/', {
       method: 'POST',
       headers: {
@@ -37,9 +40,22 @@ class JoinRoomComponent extends React.Component {
         PersonName: personName,
       })
     })
-      .then(response => response.json())
+      .then(response => {
+        if (response.status !== 200) {
+          throw new Non200ResponseError(response);
+        }
+        return response.json();
+      })
       .then(jsonBody => this.props.onRoomJoined(jsonBody.RoomCode, jsonBody.PersonId))
-      .catch((error) => { console.error(error); })
+      .catch((error) => {
+        if (error instanceof Non200ResponseError) {
+          error.response.text().then(message => {
+            this.setState({ errorMessage: message });
+          });
+          return;
+        }
+        console.error(error);
+      })
   }
 
   handleRoomChange(event) {
@@ -75,6 +91,7 @@ class JoinRoomComponent extends React.Component {
           onKeyUp={this.handleRoomCodeKeyUp}
           placeholder="Enter 4 letter room code" />
         <button onClick={this.joinRoom}>Join Room</button>
+        <div>{this.state.errorMessage}</div>
       </div>
     );
   }
