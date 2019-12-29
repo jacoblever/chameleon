@@ -28,8 +28,17 @@ namespace DataStore
             {
                 RoomCode = roomCode
             };
-            _dynamoTable.SaveRoom(room);
+            Save(room);
             return room;
+        }
+
+        private void Save(Room room)
+        {
+            const int nineHours = 9 * 60 * 60;
+            var now = DateTimeOffset.Now.ToUnixTimeSeconds();
+            room.LastModified = now;
+            room.TimeToLive = now + nineHours;
+            _dynamoTable.SaveRoom(room);
         }
 
         private string FindAvailableRoomCode()
@@ -59,7 +68,7 @@ namespace DataStore
             ThrowIfPersonNameNotUnique(room, personName);
             var personId = Guid.NewGuid().ToString();
             room.AddPerson(personId, personName);
-            _dynamoTable.SaveRoom(room);
+            Save(room);
             return personId;
         }
 
@@ -87,7 +96,7 @@ namespace DataStore
                         : word);
             }
             room.SetGoesFirst(firstPersonId);
-            _dynamoTable.SaveRoom(room);
+            Save(room);
         }
 
         public Room GetRoom(string roomCode)
@@ -99,7 +108,7 @@ namespace DataStore
         {
             var room = GetRoom(roomCode);
             room.RemovePerson(personId);
-            _dynamoTable.SaveRoom(room);
+            Save(room);
         }
     }
 }
