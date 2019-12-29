@@ -22,7 +22,7 @@ test_not_dynamo:
 .PHONY: run_backend
 run_backend:
 	sam build
-	sam local start-api
+	sam local start-api --port 3001
 
 .PHONY: dynamo_server
 dynamo_server:
