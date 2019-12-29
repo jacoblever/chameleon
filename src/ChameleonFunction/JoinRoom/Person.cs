@@ -1,4 +1,4 @@
-namespace ChameleonJoinRoomFunction
+namespace ChameleonFunction.JoinRoom
 {
     public class Person
     {
