@@ -12,9 +12,7 @@ class InRoomComponent extends React.Component {
       character: null,
       firstPersonName: null,
       timeToPollMillisecond: null,
-      lastStatusHash: null,
       polling: true,
-      roomOld: false,
     };
 
     this.poll = this.poll.bind(this);
@@ -25,14 +23,6 @@ class InRoomComponent extends React.Component {
   }
 
   poll() {
-    const stopPollingSeconds = 100;
-    if (
-      this.state.timeOfLastChangeUtc
-      && this.nowAsUnixTimestampUtc() - this.state.timeOfLastChangeUtc > stopPollingSeconds
-    ) {
-      this.setState({ polling: false, roomOld: true });
-      return;
-    }
     if (!this.state.polling) {
       return;
     }
@@ -43,11 +33,16 @@ class InRoomComponent extends React.Component {
         [Config.personIdHeader()]: this.props.personId,
       }
     })
-      .then(response => response.json())
-      .then(jsonBody => {
-        if (this.state.lastStatusHash !== jsonBody.Hash) {
-          this.setState({timeOfLastChangeUtc: this.nowAsUnixTimestampUtc()});
+      .then(response => {
+        if (response.status !== 200) {
+          throw {
+            non200Response: true,
+            response: response,
+          };
         }
+        return response.json();
+      })
+      .then(jsonBody => {
         this.setState({
           name: jsonBody.Name,
           numberOfPeopleInRoom: jsonBody.PeopleCount,
@@ -56,13 +51,19 @@ class InRoomComponent extends React.Component {
           character: jsonBody.Character,
           firstPersonName: jsonBody.FirstPersonName,
           timeToPollMillisecond: jsonBody.TimeToPollMillisecond,
-          lastStatusHash: jsonBody.Hash,
         });
         if (jsonBody.TimeToPollMillisecond) {
           setTimeout(this.poll, jsonBody.TimeToPollMillisecond);
         }
       })
       .catch((error) => {
+        if (error.non200Response) {
+          let status = error.response.status;
+          if (status === 404 || status === 403) {
+            this.props.onRoomLeft()
+            return;
+          }
+        }
         console.error(error);
         // If we've had at least one successful response, and so this error
         // was probably just a one off, still try again.
@@ -95,10 +96,6 @@ class InRoomComponent extends React.Component {
     .then(() => this.props.onRoomLeft())
     .catch((error) => { console.error(error); });
   }
-
-  nowAsUnixTimestampUtc() {
-    return Math.floor((new Date()).getTime() / 1000);
-  }
   
   render() {
     return (
@@ -107,9 +104,6 @@ class InRoomComponent extends React.Component {
           <div>Loading...</div>
         ) : (
           <div>
-            {this.state.roomOld && 
-              <div>Still playing? <a href={window.location}>Refresh</a></div>
-            }
             Welcome {this.state.name} to room {this.props.roomCode}.
             <br />
             <div>There are {this.state.numberOfPeopleInRoom} people in the room, {this.state.numberOfChameleonsInRoom} of them are Chameleons!</div>
