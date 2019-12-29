@@ -34,7 +34,9 @@ namespace DataStore
 
         private void Save(Room room)
         {
-            room.LastModified = DateTimeOffset.Now.ToUnixTimeSeconds();
+            var now = DateTimeOffset.Now.ToUnixTimeSeconds();
+            room.LastModified = now;
+            room.TimeToLive = now + 30;
             _dynamoTable.SaveRoom(room);
         }
 

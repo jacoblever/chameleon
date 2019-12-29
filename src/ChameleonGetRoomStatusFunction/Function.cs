@@ -31,6 +31,18 @@ namespace ChameleonGetRoomStatusFunction
                     },
                 };
             }
+            catch (RoomDoesNotExistException e)
+            {
+                return new APIGatewayProxyResponse
+                {
+                    StatusCode = 404,
+                    Body = e.Message,
+                    Headers = new Dictionary<string, string>
+                    {
+                        { "Access-Control-Allow-Origin", "*" },
+                    },
+                };
+            }
             catch (PersonNotInRoomException e)
             {
                 return new APIGatewayProxyResponse

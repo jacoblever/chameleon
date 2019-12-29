@@ -29,6 +29,13 @@ namespace DataStore
             get => _dynamoModel.LastModified;
             set => _dynamoModel.LastModified = value;
         }
+
+        public long TimeToLive
+        {
+            get => _dynamoModel.TimeToLive;
+            set => _dynamoModel.TimeToLive = value;
+        }
+        
         public string GetNameFor(string personId)
         {
             return _dynamoModel.PersonByPersonId[personId].Name;
@@ -78,6 +85,7 @@ namespace DataStore
             public string RoomCode { get; set; }
             public Dictionary<string, Person> PersonByPersonId { get; set; } = new Dictionary<string, Person>();
             public long LastModified { get; set; }
+            public long TimeToLive { get; set; }
 
             internal class Person
             {
