@@ -1,6 +1,6 @@
 using System;
 
-namespace ChameleonJoinRoomFunction
+namespace ChameleonFunction
 {
     public class PersonNameMustBeSpecifiedException : Exception
     {

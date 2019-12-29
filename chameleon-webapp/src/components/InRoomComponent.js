@@ -1,5 +1,6 @@
 import React from 'react';
 import Config from '../Config'
+import Non200ResponseError from '../Non200ResponseError'
 
 class InRoomComponent extends React.Component {
   constructor(props) {
@@ -45,10 +46,7 @@ class InRoomComponent extends React.Component {
     })
       .then(response => {
         if (response.status !== 200) {
-          throw {
-            non200Response: true,
-            response: response,
-          };
+          throw new Non200ResponseError(response);
         }
         return response.json();
       })
@@ -71,7 +69,7 @@ class InRoomComponent extends React.Component {
         }
       })
       .catch((error) => {
-        if (error.non200Response) {
+        if (error instanceof Non200ResponseError) {
           let status = error.response.status;
           if (status === 404 || status === 403) {
             this.props.onRoomLeft()

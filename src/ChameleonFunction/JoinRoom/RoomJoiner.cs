@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 using GameLogic;
 using Newtonsoft.Json.Linq;
 
-namespace ChameleonJoinRoomFunction
+namespace ChameleonFunction.JoinRoom
 {
     public class RoomJoiner
     {

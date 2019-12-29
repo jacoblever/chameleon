@@ -1,28 +1,38 @@
-using System;
 using System.Collections.Generic;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using GameLogic;
+using Newtonsoft.Json;
 
-// Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
-[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
-
-namespace ChameleonStartGameFunction
+namespace ChameleonFunction.RoomStatus
 {
-    public class Function
+    public class RoomStatusHandler
     {
-        public APIGatewayProxyResponse FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
+        public APIGatewayProxyResponse Handle(APIGatewayProxyRequest request, ILambdaContext context)
         {
             var roomCode = request.QueryStringParameters["RoomCode"];
             var personId = GetPersonId(request);
 
             try
             {
-                ChameleonGame.Create().StartGame(roomCode, personId);
+                var status = ChameleonGame.Create().GetRoomStatus(roomCode, personId);
                 return new APIGatewayProxyResponse
                 {
-                    StatusCode = 204,
-                    Body = "",
+                    StatusCode = 200,
+                    Body = JsonConvert.SerializeObject(status),
+                    Headers = new Dictionary<string, string>
+                    {
+                        { "Content-Type", "application/json" },
+                        { "Access-Control-Allow-Origin", "*" },
+                    },
+                };
+            }
+            catch (RoomDoesNotExistException e)
+            {
+                return new APIGatewayProxyResponse
+                {
+                    StatusCode = 404,
+                    Body = e.Message,
                     Headers = new Dictionary<string, string>
                     {
                         { "Access-Control-Allow-Origin", "*" },
@@ -35,18 +45,6 @@ namespace ChameleonStartGameFunction
                 {
                     StatusCode = 403,
                     Body = e.Message,
-                    Headers = new Dictionary<string, string>
-                    {
-                        { "Access-Control-Allow-Origin", "*" },
-                    },
-                };
-            }
-            catch (Exception e)
-            {
-                return new APIGatewayProxyResponse
-                {
-                    StatusCode = 500,
-                    Body = $"{e.Message}\n{e.StackTrace}",
                     Headers = new Dictionary<string, string>
                     {
                         { "Access-Control-Allow-Origin", "*" },
