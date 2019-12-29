@@ -12,7 +12,9 @@ class InRoomComponent extends React.Component {
       character: null,
       firstPersonName: null,
       timeToPollMillisecond: null,
+      lastStatusHash: null,
       polling: true,
+      timeOfLastChangeUtc: null,
     };
 
     this.poll = this.poll.bind(this);
@@ -23,6 +25,14 @@ class InRoomComponent extends React.Component {
   }
 
   poll() {
+    const stopPollingSeconds = 30;
+    if (
+      this.state.timeOfLastChangeUtc
+      && this.nowAsUnixTimestampUtc() - this.state.timeOfLastChangeUtc > stopPollingSeconds
+    ) {
+      this.setState({ polling: false, roomOld: true });
+      return;
+    }
     if (!this.state.polling) {
       return;
     }
@@ -43,6 +53,9 @@ class InRoomComponent extends React.Component {
         return response.json();
       })
       .then(jsonBody => {
+        if (this.state.lastStatusHash !== jsonBody.Hash) {
+          this.setState({timeOfLastChangeUtc: this.nowAsUnixTimestampUtc()});
+        }
         this.setState({
           name: jsonBody.Name,
           numberOfPeopleInRoom: jsonBody.PeopleCount,
@@ -51,6 +64,7 @@ class InRoomComponent extends React.Component {
           character: jsonBody.Character,
           firstPersonName: jsonBody.FirstPersonName,
           timeToPollMillisecond: jsonBody.TimeToPollMillisecond,
+          lastStatusHash: jsonBody.Hash,
         });
         if (jsonBody.TimeToPollMillisecond) {
           setTimeout(this.poll, jsonBody.TimeToPollMillisecond);
@@ -97,6 +111,10 @@ class InRoomComponent extends React.Component {
     .catch((error) => { console.error(error); });
   }
   
+  nowAsUnixTimestampUtc() {
+    return Math.floor((new Date()).getTime() / 1000);
+  }
+
   render() {
     return (
       <div>
@@ -104,6 +122,9 @@ class InRoomComponent extends React.Component {
           <div>Loading...</div>
         ) : (
           <div>
+            {this.state.roomOld && 
+              <div>Still playing? <a href={window.location}>Refresh</a></div>
+            }
             Welcome {this.state.name} to room {this.props.roomCode}.
             <br />
             <div>There are {this.state.numberOfPeopleInRoom} people in the room, {this.state.numberOfChameleonsInRoom} of them are Chameleons!</div>
