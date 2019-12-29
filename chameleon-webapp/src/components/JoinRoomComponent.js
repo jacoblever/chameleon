@@ -66,6 +66,7 @@ class JoinRoomComponent extends React.Component {
           onChange={this.handlePersonChange}
           placeholder="Enter your name" />
         <br/>
+        <hr></hr>
         <button onClick={this.createRoom}>Create Room</button>
         <br /> or <br />
         <input
