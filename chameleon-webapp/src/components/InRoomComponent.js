@@ -25,10 +25,10 @@ class InRoomComponent extends React.Component {
   }
 
   poll() {
-    const stopPollingSeconds = 30;
+    const tenMinutes = 10 * 60;
     if (
       this.state.timeOfLastChangeUtc
-      && this.nowAsUnixTimestampUtc() - this.state.timeOfLastChangeUtc > stopPollingSeconds
+      && this.nowAsUnixTimestampUtc() - this.state.timeOfLastChangeUtc > tenMinutes
     ) {
       this.setState({ polling: false, roomOld: true });
       return;

@@ -11,7 +11,7 @@ namespace ChameleonFunction
             ChameleonCount = chameleonCount;
             State = state;
             Character = character;
-            TimeToPollMillisecond = 5000;
+            TimeToPollMillisecond = new Random().Next(400, 700);
         }
 
         public string Code { get; }
