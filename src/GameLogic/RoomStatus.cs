@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -22,7 +23,7 @@ namespace GameLogic
             State = state;
             Character = character;
             FirstPersonName = firstPersonName;
-            TimeToPollMillisecond = 5000;
+            TimeToPollMillisecond = new Random().Next(400, 700);
         }
 
         public string Name { get; set; }
