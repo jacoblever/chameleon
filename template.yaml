@@ -37,66 +37,6 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: prod
-  ChameleonJoinRoomFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-    Properties:
-      CodeUri: ./src/ChameleonJoinRoomFunction/
-      Handler: ChameleonJoinRoomFunction::ChameleonJoinRoomFunction.Function::FunctionHandler
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ChameleonDynamoTable
-      Events:
-        JoinRoom:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-          Properties:
-            RestApiId: !Ref ApiGatewayApi
-            Path: /api/join-room
-            Method: post
-  ChameleonGetRoomStatusFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: ./src/ChameleonGetRoomStatusFunction/
-      Handler: ChameleonGetRoomStatusFunction::ChameleonGetRoomStatusFunction.Function::FunctionHandler
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ChameleonDynamoTable
-      Events:
-        RoomStatus:
-          Type: Api
-          Properties:
-            RestApiId: !Ref ApiGatewayApi
-            Path: /api/room-status
-            Method: get
-  ChameleonStartGameFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: ./src/ChameleonStartGameFunction/
-      Handler: ChameleonStartGameFunction::ChameleonStartGameFunction.Function::FunctionHandler
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ChameleonDynamoTable
-      Events:
-        StartGame:
-          Type: Api
-          Properties:
-            RestApiId: !Ref ApiGatewayApi
-            Path: /api/start-game
-            Method: post
-  ChameleonLeaveRoomFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: ./src/ChameleonLeaveRoomFunction/
-      Handler: ChameleonLeaveRoomFunction::ChameleonLeaveRoomFunction.Function::FunctionHandler
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ChameleonDynamoTable
-      Events:
-        LeaveRoom:
-          Type: Api
-          Properties:
-            RestApiId: !Ref ApiGatewayApi
-            Path: /api/leave-room
-            Method: post
   ChameleonFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -117,12 +57,12 @@ Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  ChameleonJoinRoomApi:
+  ChameleonApi:
     Description: "API Gateway endpoint URL for Prod stage for Join Room function"
     Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  ChameleonJoinRoomFunction:
+    ChameleonFunction:
     Description: "Join Room Lambda Function ARN"
-    Value: !GetAtt ChameleonJoinRoomFunction.Arn
-  ChameleonJoinRoomFunctionIamRole:
+    Value: !GetAtt ChameleonFunction.Arn
+    ChameleonFunctionIamRole:
     Description: "Implicit IAM Role created for Join Room function"
-    Value: !GetAtt ChameleonJoinRoomFunctionRole.Arn
+    Value: !GetAtt ChameleonFunctionRole.Arn
