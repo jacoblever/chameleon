@@ -45,6 +45,8 @@ class ChameleonComponent extends React.Component {
           <img
             src='https://image.shutterstock.com/image-vector/cartoon-lizard-on-branch-260nw-370250969.jpg'
             alt="Chameleon!"
+            height="170px"
+            width="260px"
           />
           <br />
           {(this.state.roomCode != null) ? (
