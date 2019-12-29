@@ -41,12 +41,16 @@ namespace GameLogic
         public RoomStatus GetRoomStatus(string roomCode, string personId)
         {
             var room = _roomStore.GetRoom(roomCode);
+            if (room == null)
+            {
+                throw new RoomDoesNotExistException(roomCode);
+            }
             ThrowUnlessPersonInRoom(roomCode, personId, room);
 
             var name = room.GetNameFor(personId);
             var peopleCount = room.PersonIds.Count;
             var myCharacter = room.GetCharacterFor(personId);
-            
+
             return new RoomStatus(
                 code: roomCode,
                 name: name,

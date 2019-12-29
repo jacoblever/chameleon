@@ -11,7 +11,10 @@ class InRoomComponent extends React.Component {
       roomState: null,
       character: null,
       firstPersonName: null,
+      timeToPollMillisecond: null,
+      lastStatusHash: null,
       polling: true,
+      timeOfLastChangeUtc: null,
     };
 
     this.poll = this.poll.bind(this);
@@ -22,8 +25,16 @@ class InRoomComponent extends React.Component {
   }
 
   poll() {
-    if(!this.state.polling) {
-      return
+    const tenMinutes = 10 * 60;
+    if (
+      this.state.timeOfLastChangeUtc
+      && this.nowAsUnixTimestampUtc() - this.state.timeOfLastChangeUtc > tenMinutes
+    ) {
+      this.setState({ polling: false, roomOld: true });
+      return;
+    }
+    if (!this.state.polling) {
+      return;
     }
     fetch(Config.backendBaseApiUrl() + 'room-status/?RoomCode=' + this.props.roomCode, {
       method: 'GET',
@@ -32,8 +43,19 @@ class InRoomComponent extends React.Component {
         [Config.personIdHeader()]: this.props.personId,
       }
     })
-      .then(response => response.json())
+      .then(response => {
+        if (response.status !== 200) {
+          throw {
+            non200Response: true,
+            response: response,
+          };
+        }
+        return response.json();
+      })
       .then(jsonBody => {
+        if (this.state.lastStatusHash !== jsonBody.Hash) {
+          this.setState({timeOfLastChangeUtc: this.nowAsUnixTimestampUtc()});
+        }
         this.setState({
           name: jsonBody.Name,
           numberOfPeopleInRoom: jsonBody.PeopleCount,
@@ -41,12 +63,28 @@ class InRoomComponent extends React.Component {
           roomState: jsonBody.State,
           character: jsonBody.Character,
           firstPersonName: jsonBody.FirstPersonName,
+          timeToPollMillisecond: jsonBody.TimeToPollMillisecond,
+          lastStatusHash: jsonBody.Hash,
         });
         if (jsonBody.TimeToPollMillisecond) {
           setTimeout(this.poll, jsonBody.TimeToPollMillisecond);
         }
       })
-      .catch((error) => { console.error(error); })
+      .catch((error) => {
+        if (error.non200Response) {
+          let status = error.response.status;
+          if (status === 404 || status === 403) {
+            this.props.onRoomLeft()
+            return;
+          }
+        }
+        console.error(error);
+        // If we've had at least one successful response, and so this error
+        // was probably just a one off, still try again.
+        if (this.state.timeToPollMillisecond) {
+          setTimeout(this.poll, this.state.timeToPollMillisecond);
+        }
+      })
   }
 
   startGame(e) {
@@ -73,6 +111,10 @@ class InRoomComponent extends React.Component {
     .catch((error) => { console.error(error); });
   }
   
+  nowAsUnixTimestampUtc() {
+    return Math.floor((new Date()).getTime() / 1000);
+  }
+
   render() {
     return (
       <div>
@@ -80,6 +122,9 @@ class InRoomComponent extends React.Component {
           <div>Loading...</div>
         ) : (
           <div>
+            {this.state.roomOld && 
+              <div>Still playing? <a href={window.location}>Refresh</a></div>
+            }
             Welcome {this.state.name} to room {this.props.roomCode}.
             <br />
             <div>There are {this.state.numberOfPeopleInRoom} people in the room, {this.state.numberOfChameleonsInRoom} of them are Chameleons!</div>
