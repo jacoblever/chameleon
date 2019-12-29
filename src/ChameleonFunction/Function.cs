@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
+using ChameleonFunction.JoinRoom;
+using ChameleonFunction.LeaveRoom;
+using ChameleonFunction.RoomStatus;
+using ChameleonFunction.StartGame;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -22,19 +26,19 @@ namespace ChameleonFunction
                 case "join-room":
                 case "join-room/":
                     return Respond(request, "POST", ()
-                        => new ChameleonJoinRoomFunction.Function().FunctionHandler(request, context));
+                        => new JoinRoomHandler().Handle(request, context));
                 case "room-status":
                 case "room-status/":
                     return Respond(request, "GET", ()
-                        => new ChameleonGetRoomStatusFunction.Function().FunctionHandler(request, context));
+                        => new RoomStatusHandler().Handle(request, context));
                 case "start-game":
                 case "start-game/":
                     return Respond(request, "POST", ()
-                        => new ChameleonStartGameFunction.Function().FunctionHandler(request, context));
+                        => new StartGameHandler().Handle(request, context));
                 case "leave-room":
                 case "leave-room/":
                     return Respond(request, "POST", ()
-                        => new ChameleonLeaveRoomFunction.Function().FunctionHandler(request, context));
+                        => new LeaveRoomHandler().Handle(request, context));
                 default:
                     return CreateNotFoundResponse(request);
             }

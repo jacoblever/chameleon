@@ -19,10 +19,6 @@ deploy_steps: &deploy_steps
     - run: dotnet tool install --global Amazon.Lambda.Tools
     - run: mkdir ~/.aws && echo -e "[default]\naws_access_key_id=$AWS_ACCESS_KEY_ID\naws_secret_access_key=$AWS_SECRET_ACCESS_KEY\n" > ~/.aws/credentials
     - run: cd ./src/ChameleonFunction/ && /root/.dotnet/tools/dotnet-lambda deploy-function ChameleonFunction --region "eu-west-1"
-    - run: cd ./src/ChameleonGetRoomStatusFunction/ && /root/.dotnet/tools/dotnet-lambda deploy-function ChameleonGetRoomStatusFunction --region "eu-west-1"
-    - run: cd ./src/ChameleonJoinRoomFunction/ && /root/.dotnet/tools/dotnet-lambda deploy-function ChameleonJoinRoomFunction --region "eu-west-1"
-    - run: cd ./src/ChameleonLeaveRoomFunction/ && /root/.dotnet/tools/dotnet-lambda deploy-function ChameleonLeaveRoomFunction --region "eu-west-1"
-    - run: cd ./src/ChameleonStartGameFunction/ && /root/.dotnet/tools/dotnet-lambda deploy-function ChameleonStartGameFunction --region "eu-west-1"
 
 webapp_test_steps: &webapp_test_steps
   docker:
