@@ -1,4 +1,5 @@
-using ChameleonJoinRoomFunction;
+using ChameleonFunction;
+using ChameleonFunction.JoinRoom;
 using Moq;
 using NUnit.Framework;
 

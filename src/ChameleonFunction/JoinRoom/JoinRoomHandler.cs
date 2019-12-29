@@ -6,14 +6,11 @@ using DataStore;
 using GameLogic;
 using Newtonsoft.Json;
 
-// Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
-[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
-
-namespace ChameleonJoinRoomFunction
+namespace ChameleonFunction.JoinRoom
 {
-    public class Function
+    public class JoinRoomHandler
     {
-        public APIGatewayProxyResponse FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
+        public APIGatewayProxyResponse Handle(APIGatewayProxyRequest request, ILambdaContext context)
         {
             var headers = new Dictionary<string, string>
             {
