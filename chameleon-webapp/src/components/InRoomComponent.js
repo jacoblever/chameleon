@@ -139,11 +139,19 @@ class InRoomComponent extends React.Component {
             ) : (
               <div>
                 {this.state.character === "chameleon" ? (
-                  <div>You are a chameleon!</div>
+                  <div>
+                  The word is <br/> <strong><font color="red">???</font></strong>
+                  <br/>
+                  You are a chameleon! Try and blend in
+                  </div>
                 ) : (
-                  <div>The word is '{this.state.character}'</div>
+                  <div>The word is <br/> <strong><font color="red">{this.state.character}</font></strong></div>
                 )}
-                <div>{this.state.firstPersonName} goes first</div>
+                {this.state.name === this.state.firstPersonName ? (
+                  <div>You start!</div>
+                ) : (
+                  <div>{this.state.firstPersonName} goes first</div>
+                )}
                 <button onClick={this.startGame}>Start New Game</button>
               </div>
             )}
