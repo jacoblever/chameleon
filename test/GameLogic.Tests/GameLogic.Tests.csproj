@@ -14,7 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\ChameleonJoinRoomFunction\ChameleonJoinRoomFunction.csproj" />
+      <ProjectReference Include="..\..\src\ChameleonFunction\ChameleonFunction.csproj" />
       <ProjectReference Include="..\..\src\GameLogic\GameLogic.csproj" />
     </ItemGroup>
 
