@@ -1,0 +1,31 @@
+.Chameleon {
+  text-align: center;
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.Chameleon-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 170px;
+  width: 260px;
+  pointer-events: none;
+}
+
+.Chameleon-header {
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.Chameleon-game {
+  font-size: calc(10px + 1vmin);
+  color: white;
+  margin-top: 20px;
+}
+
+.Chameleon-link {
+  color: #61dafb;
+}

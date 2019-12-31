@@ -1,5 +1,6 @@
 import React from 'react';
 import Config from '../Config'
+import './JoinRoomComponent.css'
 import Non200ResponseError from '../Non200ResponseError'
 
 class JoinRoomComponent extends React.Component {
@@ -80,18 +81,29 @@ class JoinRoomComponent extends React.Component {
           type="text"
           value={this.state.personNameInput}
           onChange={this.handlePersonChange}
+          tabIndex="1"
           placeholder="Enter your name" />
         <br/>
-        <button onClick={this.createRoom}>Create Room</button>
-        <br /> or <br />
+        <hr/>
+        <div>Already have a room code?</div>
         <input
           type="text"
           value={this.state.roomCodeInput}
           onChange={this.handleRoomChange}
           onKeyUp={this.handleRoomCodeKeyUp}
-          placeholder="Enter 4 letter room code" />
-        <button onClick={this.joinRoom}>Join Room</button>
-        <div>{this.state.errorMessage}</div>
+          tabIndex="2"
+          placeholder="Enter room code" />
+        <button onClick={this.joinRoom} tabIndex="3">
+          Join
+        </button>
+
+        <br/><br/>otherwise<br/>
+
+        <button onClick={this.createRoom} tabIndex="4">
+          Create a new room
+        </button>
+      
+        <div className="error">{this.state.errorMessage}</div>
       </div>
     );
   }
