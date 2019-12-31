@@ -86,7 +86,7 @@ namespace GameLogic
             
             foreach (var personId in personIds)
             {
-                var weight = chameleons.Contains(personId) ? 3 : 10;
+                var weight = chameleons.Contains(personId) ? 1 : 7;
                 for (var i = 0; i < weight; i++)
                 {
                     weightedPersonIds.Add(personId);
