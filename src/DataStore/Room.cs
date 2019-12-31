@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace DataStore
@@ -35,7 +36,13 @@ namespace DataStore
             get => _dynamoModel.TimeToLive;
             set => _dynamoModel.TimeToLive = value;
         }
-        
+
+        public string OldestPersonId =>
+            _dynamoModel.PersonByPersonId
+                .OrderBy(x => x.Value.DateAddedUtc)
+                .First()
+                .Key;
+
         public string GetNameFor(string personId)
         {
             return _dynamoModel.PersonByPersonId[personId].Name;
@@ -89,7 +96,13 @@ namespace DataStore
 
             internal class Person
             {
+                public Person()
+                {
+                    DateAddedUtc = DateTime.UtcNow;
+                }
+
                 public string Name { get; set; }
+                public DateTime DateAddedUtc { get; set; }
                 public string Character { get; set; }
                 public bool GoesFirst { get; set; }
             }

@@ -50,14 +50,17 @@ namespace GameLogic
             var name = room.GetNameFor(personId);
             var peopleCount = room.PersonIds.Count;
             var myCharacter = room.GetCharacterFor(personId);
+            var peopleNames = room.PersonIds.Select(x => room.GetNameFor(x)).ToList();
 
             return new RoomStatus(
                 code: roomCode,
                 name: name,
+                peopleInRoom: peopleNames,
                 peopleCount: peopleCount,
                 chameleonCount: GetChameleonCount(peopleCount),
                 state: myCharacter == null ? RoomState.PreGame.ToString() : RoomState.InGame.ToString(),
                 character: myCharacter,
+                showStartGameButton: room.OldestPersonId == personId,
                 firstPersonName: myCharacter == null ? null : room.WhoGoesFirstByName());
         }
 
@@ -83,7 +86,7 @@ namespace GameLogic
             
             foreach (var personId in personIds)
             {
-                var weight = chameleons.Contains(personId) ? 3 : 10;
+                var weight = chameleons.Contains(personId) ? 1 : 7;
                 for (var i = 0; i < weight; i++)
                 {
                     weightedPersonIds.Add(personId);
