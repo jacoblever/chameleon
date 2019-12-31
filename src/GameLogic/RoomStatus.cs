@@ -27,7 +27,7 @@ namespace GameLogic
             Character = character;
             ShowStartGameButton = showStartGameButton;
             FirstPersonName = firstPersonName;
-            TimeToPollMillisecond = new Random().Next(400, 700);
+            TimeToPollMillisecond = new Random().Next(600, 1000);
         }
 
         public string Code { get; }
