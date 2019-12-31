@@ -12,6 +12,7 @@ class InRoomComponent extends React.Component {
       numberOfChameleonsInRoom: null,
       roomState: null,
       character: null,
+      showStartGameButton: null,
       firstPersonName: null,
       timeToPollMillisecond: null,
       lastStatusHash: null,
@@ -61,6 +62,7 @@ class InRoomComponent extends React.Component {
           numberOfChameleonsInRoom: jsonBody.ChameleonCount,
           roomState: jsonBody.State,
           character: jsonBody.Character,
+          showStartGameButton: jsonBody.ShowStartGameButton,
           firstPersonName: jsonBody.FirstPersonName,
           timeToPollMillisecond: jsonBody.TimeToPollMillisecond,
           lastStatusHash: jsonBody.Hash,
@@ -160,13 +162,17 @@ class InRoomComponent extends React.Component {
             {this.state.roomOld && 
               <div>Still playing? <a href={window.location} className="Chameleon-link">Refresh</a></div>
             }
-            <div className="InRoom-room_code">Room code: <span className="InRoom-room_code-code">{this.props.roomCode}</span></div>
+            <div className="InRoom-room_code">
+              Room code: <span className="InRoom-room_code-code">{this.props.roomCode}</span>
+              <br />
+              Players: {this.state.numberOfPeopleInRoom}
+            </div>
             {this.state.roomState === "PreGame" ? (
               <div>
                 <div>
                   {this.welcomeMessage()}
                 </div>
-                {this.state.numberOfPeopleInRoom >= 3 && 
+                {this.state.numberOfPeopleInRoom >= 3 && this.state.showStartGameButton && 
                   <button onClick={this.startGame}>Start Game</button>
                 }
               </div>
@@ -190,9 +196,11 @@ class InRoomComponent extends React.Component {
                   {this.whatToDo()}
                 </div>
                 
-                <div className="InRoom-start_new_game">
-                  <button onClick={this.startGame}>Start New Game</button>
-                </div>
+                {this.state.showStartGameButton && (
+                  <div className="InRoom-start_new_game">
+                    <button onClick={this.startGame}>Start New Game</button>
+                  </div>
+                )}
               </div>
             )}
             <div className="InRoom-leave">
