@@ -1,6 +1,7 @@
 import React from 'react';
 import Config from '../Config'
 import Non200ResponseError from '../Non200ResponseError'
+import './InRoomComponent.css'
 
 class InRoomComponent extends React.Component {
   constructor(props) {
@@ -113,39 +114,90 @@ class InRoomComponent extends React.Component {
     return Math.floor((new Date()).getTime() / 1000);
   }
 
+  welcomeMessage() {
+    if (this.state.numberOfPeopleInRoom === 1) {
+      return <span>You've created a new room! To play a game tell your friends to open this page on their phones and use room code '{this.props.roomCode}'</span>
+    } else if(this.state.numberOfPeopleInRoom < 3) {
+      return <span>Keep inviting - You need at least 3 people to play a game!</span>
+    } else {
+      return <span>There's {this.state.numberOfPeopleInRoom} of you ready to play.<br/>Once everyone's in, click Start Game</span>
+    }
+  }
+
+  whatToDo() {
+    let chameleonCount = this.state.numberOfChameleonsInRoom;
+    if (this.state.character === "chameleon") {
+      let brackets = "";
+      if (chameleonCount === 2) {
+        brackets = " (apart from the other chameleon)"
+      } else if (chameleonCount > 2) {
+        brackets = ` (apart from the other ${chameleonCount-1} chameleons)`
+      }
+      return <div>
+        Everyone else{brackets} has been given the same word,
+        they'll take it in turns to say a <i>single</i> word that relates to it.
+        Try to blend in and hide the fact that you are a chameleon!
+      </div>
+    } else {
+      let chameleonCountMessage = chameleonCount === 1
+        ? "One of the others is a chameleon and doesn't know the word."
+        : `${chameleonCount} of the others are chameleons who don't know the word.`
+      return <div>
+        Take it in turns to say a <i>single</i> word that relates to the word above. {chameleonCountMessage}
+        <br />
+        Don't make it too easy for them to blend in with everyone else.
+      </div>
+    }
+  }
+
   render() {
     return (
-      <div>
+      <div className="InRoom-game_area">
         {this.state.roomState === null ? (
-          <div>Loading...</div>
+          <div>Loading game...</div>
         ) : (
           <div>
             {this.state.roomOld && 
-              <div>Still playing? <a href={window.location}>Refresh</a></div>
+              <div>Still playing? <a href={window.location} className="Chameleon-link">Refresh</a></div>
             }
-            Welcome {this.state.name} to room {this.props.roomCode}.
-            <br />
-            <div>There are {this.state.numberOfPeopleInRoom} people in the room, {this.state.numberOfChameleonsInRoom} of them are Chameleons!</div>
+            <div className="InRoom-room_code">Room code: <span className="InRoom-room_code-code">{this.props.roomCode}</span></div>
             {this.state.roomState === "PreGame" ? (
               <div>
-                {this.state.numberOfPeopleInRoom < 3 ? (
-                  <div>You need at least 3 people to play a game!</div>
-                ) : (
+                <div>
+                  {this.welcomeMessage()}
+                </div>
+                {this.state.numberOfPeopleInRoom >= 3 && 
                   <button onClick={this.startGame}>Start Game</button>
-                )}
+                }
               </div>
             ) : (
               <div>
-                {this.state.character === "chameleon" ? (
-                  <div>You are a chameleon!</div>
-                ) : (
-                  <div>The word is '{this.state.character}'</div>
-                )}
-                <div>{this.state.firstPersonName} goes first</div>
-                <button onClick={this.startGame}>Start New Game</button>
+                <div>The word is</div>
+                <div className="InRoom-character">
+                  {this.state.character === "chameleon" ? "???" : this.state.character}
+                </div>
+                <div>
+                  {this.state.character === "chameleon" && 
+                    <i>You are a chameleon! Try and blend in</i>
+                  }
+                </div>
+                
+                <div className="InRoom-who_starts">
+                  {this.state.name === this.state.firstPersonName ? "You start!" : `${this.state.firstPersonName} goes first`}
+                </div>
+                
+                <div className="InRoom-what_to_do">
+                  {this.whatToDo()}
+                </div>
+                
+                <div className="InRoom-start_new_game">
+                  <button onClick={this.startGame}>Start New Game</button>
+                </div>
               </div>
             )}
-            <button onClick={this.leaveRoom}>Leave Room</button>
+            <div className="InRoom-leave">
+              <button onClick={this.leaveRoom}>Leave Room</button>
+            </div>
           </div>
         )}
       </div>

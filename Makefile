@@ -19,10 +19,14 @@ test:
 test_not_dynamo:
 	dotnet test --filter TestCategory!=DynamoTests
 
-.PHONY: run_backend
-run_backend:
+.PHONY: back
+back:
 	sam build
 	sam local start-api --port 3001
+
+.PHONY: front
+front:
+	(cd chameleon-webapp/ && npm start)
 
 .PHONY: dynamo_server
 dynamo_server:
@@ -31,7 +35,7 @@ dynamo_server:
 	docker run -p 8000:8000 --name localtestdb amazon/dynamodb-local
 
 .PHONY: start_dynamo
-start_dynamo:
+start_dynamo: stop_dynamo
 	make dynamo_server >> $(DYNAMO_LOG_FILE) 2>&1 & echo $$! > $(PID)
 	./.dynamo/create-table.sh
 
