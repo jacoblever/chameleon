@@ -3,6 +3,8 @@ import JoinRoomComponent from './JoinRoomComponent';
 import InRoomComponent from './InRoomComponent';
 import Cookies from 'js-cookie';
 import Config from '../Config'
+import logo from './logo.jpg'
+import './ChameleonComponent.css';
 
 class ChameleonComponent extends React.Component {
   constructor(props) {
@@ -34,31 +36,37 @@ class ChameleonComponent extends React.Component {
     Cookies.remove('roomCode');
     this.setState({roomCode: null, personId: null});
   }
+
+  gameComponent() {
+    if (this.state.roomCode != null) {
+      return <InRoomComponent
+        roomCode={this.state.roomCode}
+        personId={this.state.personId}
+        onRoomLeft={this.onRoomLeft}
+      />
+    } else {
+      return <JoinRoomComponent
+        onRoomJoined={this.onRoomJoined}
+      />
+    }
+  }
   
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
+      <div className="Chameleon">
+        <header className="Chameleon-header">
           <p>
             Welcome to Chameleon!
           </p>
           <img
-            src='https://image.shutterstock.com/image-vector/cartoon-lizard-on-branch-260nw-370250969.jpg'
+            src={logo}
+            className="Chameleon-logo"
             alt="Chameleon!"
-            height="170px"
-            width="260px"
           />
-          <br />
-          {(this.state.roomCode != null) ? (
-            <InRoomComponent 
-              roomCode={this.state.roomCode} 
-              personId={this.state.personId}
-              onRoomLeft={this.onRoomLeft} />
-          ) : (
-            <JoinRoomComponent 
-              onRoomJoined={this.onRoomJoined} />
-          )}
         </header>
+        <div className="Chameleon-game">
+          {this.gameComponent()}
+        </div>
       </div>
     );
   }
