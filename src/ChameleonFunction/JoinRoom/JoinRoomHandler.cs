@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using DataStore;
@@ -12,67 +10,33 @@ namespace ChameleonFunction.JoinRoom
     {
         public APIGatewayProxyResponse Handle(APIGatewayProxyRequest request, ILambdaContext context)
         {
-            var headers = new Dictionary<string, string>
+            return new Responder().Respond(response =>
             {
-                { "Access-Control-Allow-Origin", "*" },
-            };
-            try
-            {
-                var chameleonGame = ChameleonGame.Create();
-                var person = new RoomJoiner(chameleonGame)
-                    .Join(request.Body);
-                return new APIGatewayProxyResponse
+                try
                 {
-                    StatusCode = 200,
-                    Body = JsonConvert.SerializeObject(person),
-                    Headers = headers,
-                };
-            }
-            catch (PersonNameMustBeSpecifiedException e)
-            {
-                return new APIGatewayProxyResponse
+                    var chameleonGame = ChameleonGame.Create();
+                    var person = new RoomJoiner(chameleonGame)
+                        .Join(request.Body);
+
+                    response.StatusCode = 200;
+                    response.Body = JsonConvert.SerializeObject(person);
+                }
+                catch (PersonNameMustBeSpecifiedException e)
                 {
-                    StatusCode = 400,
-                    Body = e.Message,
-                    Headers = headers,
-                };
-            }
-            catch (RoomCodeMustBeValidException e)
-            {
-                return new APIGatewayProxyResponse
+                    response.StatusCode = 400;
+                    response.Body = e.Message;
+                }
+                catch (RoomCodeMustBeValidException e)
                 {
-                    StatusCode = 400,
-                    Body = e.Message,
-                    Headers = headers,
-                };
-            }
-            catch (RoomDoesNotExistException e)
-            {
-                return new APIGatewayProxyResponse
+                    response.StatusCode = 400;
+                    response.Body = e.Message;
+                }
+                catch (PersonNameNotUniqueException e)
                 {
-                    StatusCode = 404,
-                    Body = e.Message,
-                    Headers = headers,
-                };
-            }
-            catch (PersonNameNotUniqueException e)
-            {
-                return new APIGatewayProxyResponse
-                {
-                    StatusCode = 409,
-                    Body = e.Message,
-                    Headers = headers,
-                };
-            }
-            catch (Exception e)
-            {
-                return new APIGatewayProxyResponse
-                {
-                    StatusCode = 500,
-                    Body = $"{e.Message}\n{e.StackTrace}",
-                    Headers = headers,
-                };
-            }
+                    response.StatusCode = 409;
+                    response.Body = e.Message;
+                }
+            });
         }
     }
 }
