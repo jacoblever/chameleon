@@ -50,7 +50,12 @@ namespace DataStore
 
         public void AddPerson(string personId, string personName)
         {
-            _dynamoModel.PersonByPersonId.Add(personId, new DynamoModel.Person {Name = personName, Character = null});
+            _dynamoModel.PersonByPersonId.Add(personId, new DynamoModel.Person
+            {
+                DateAddedUtc = DateTime.UtcNow,
+                Name = personName,
+                Character = null
+            });
         }
 
         public void RemovePerson(string personId)
@@ -96,11 +101,6 @@ namespace DataStore
 
             internal class Person
             {
-                public Person()
-                {
-                    DateAddedUtc = DateTime.UtcNow;
-                }
-
                 public string Name { get; set; }
                 public DateTime DateAddedUtc { get; set; }
                 public string Character { get; set; }
