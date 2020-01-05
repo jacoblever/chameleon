@@ -4,6 +4,11 @@ namespace ChameleonFunction
 {
     public static class APIGatewayProxyRequestExtensions
     {
+        public static string GetChameleonRoomCode(this APIGatewayProxyRequest request)
+        {
+            return request.QueryStringParameters["RoomCode"];
+        }
+        
         public static string GetChameleonPersonIdHeader(this APIGatewayProxyRequest request)
         {
             if (request.Headers.TryGetValue("x-chameleon-personid", out var personId))

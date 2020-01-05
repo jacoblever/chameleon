@@ -15,6 +15,8 @@ class InRoomComponent extends React.Component {
       showStartGameButton: null,
       firstPersonName: null,
       timeToPollMillisecond: null,
+      people: [],
+      everyoneVoted: false,
       lastStatusHash: null,
       polling: true,
       timeOfLastChangeUtc: null,
@@ -23,6 +25,7 @@ class InRoomComponent extends React.Component {
     this.poll = this.poll.bind(this);
     this.startGame = this.startGame.bind(this);
     this.leaveRoom = this.leaveRoom.bind(this);
+    this.voteChange = this.voteChange.bind(this);
 
     this.poll();
   }
@@ -65,6 +68,8 @@ class InRoomComponent extends React.Component {
           showStartGameButton: jsonBody.ShowStartGameButton,
           firstPersonName: jsonBody.FirstPersonName,
           timeToPollMillisecond: jsonBody.TimeToPollMillisecond,
+          people: jsonBody.PeopleInRoom,
+          everyoneVoted: jsonBody.EveryoneVoted,
           lastStatusHash: jsonBody.Hash,
         });
         if (jsonBody.TimeToPollMillisecond) {
@@ -152,6 +157,72 @@ class InRoomComponent extends React.Component {
     }
   }
 
+  mostVotesComparer(a, b) {
+    if (a.Votes > b.Votes) {
+      return -1;
+    }
+    if (b.Votes > a.Votes) {
+      return 1;
+    }
+    return 0;
+  }
+
+  votingComponent() {
+    if (this.state.everyoneVoted) {
+      return <div className="InRoom-voting">
+        <div>The votes are in!</div>
+        <ul>
+          {this.state.people.sort(this.mostVotesComparer).filter(x => x.Votes > 0).map(person => {
+            let message = person.Votes === 1
+              ? `${person.Name} - ${person.Votes} Vote`
+              : `${person.Name} - ${person.Votes} Votes`
+            return (
+              <li key={person.Id}>{message}</li>
+            )
+          })}
+        </ul>
+      </div>
+    }
+    if (this.state.character === "chameleon") {
+      return <div className="InRoom-voting">Chameleons can't vote! Results will show once everyone else has voted.</div>
+    }
+    return <div className="InRoom-voting">
+      <div>Choose someone you think is a Chameleon:</div>
+      <ul>
+        {this.state.people.map(person => {
+          let checkboxId = `checkbox-chameleon-guess-${person.Id}`
+          return <li key={person.Id}>
+            <input
+              type="radio"
+              name="chameleon-guess"
+              value={person.Id}
+              onChange={this.voteChange}
+              id={checkboxId} />
+            <label
+              htmlFor={checkboxId} >
+              {person.Name}
+            </label>
+          </li>
+        })}
+      </ul>
+      <div>Results will show once everyone has voted.</div>
+    </div>
+  }
+
+  voteChange(e) {
+    fetch(Config.backendBaseApiUrl() + 'vote/?RoomCode=' + this.props.roomCode, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        [Config.personIdHeader()]: this.props.personId,
+      },
+      body: JSON.stringify({
+        Vote: e.target.value,
+      })
+    })
+    .catch((error) => { console.error(error); });
+  }
+
   render() {
     return (
       <div className="InRoom-game_area">
@@ -191,6 +262,8 @@ class InRoomComponent extends React.Component {
                 <div className="InRoom-who_starts">
                   {this.state.name === this.state.firstPersonName ? "You start!" : `${this.state.firstPersonName} goes first`}
                 </div>
+                
+                {this.votingComponent()}
                 
                 <div className="InRoom-what_to_do">
                   {this.whatToDo()}

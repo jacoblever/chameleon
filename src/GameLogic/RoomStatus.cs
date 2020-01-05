@@ -10,11 +10,12 @@ namespace GameLogic
     {
         public RoomStatus(string code,
             string name,
-            IReadOnlyCollection<string> peopleInRoom,
+            IReadOnlyCollection<Person> peopleInRoom,
             int peopleCount,
             int chameleonCount,
             string state,
             string character,
+            bool everyoneVoted,
             bool showStartGameButton,
             string firstPersonName)
         {
@@ -25,6 +26,7 @@ namespace GameLogic
             ChameleonCount = chameleonCount;
             State = state;
             Character = character;
+            EveryoneVoted = everyoneVoted;
             ShowStartGameButton = showStartGameButton;
             FirstPersonName = firstPersonName;
             TimeToPollMillisecond = new Random().Next(600, 1000);
@@ -32,11 +34,12 @@ namespace GameLogic
 
         public string Code { get; }
         public string Name { get; }
-        public IReadOnlyCollection<string> PeopleInRoom { get; }
+        public IReadOnlyCollection<Person> PeopleInRoom { get; }
         public int PeopleCount { get; }
         public int ChameleonCount { get; }
         public string State { get; }
         public string Character { get; }
+        public bool EveryoneVoted { get; }
         public bool ShowStartGameButton { get; }
         public string FirstPersonName { get; }
 
@@ -59,6 +62,20 @@ namespace GameLogic
                 .ComputeHash(inputBytes)
                 .Select(x => x.ToString("X2"))
                 .Concat();
+        }
+
+        public class Person
+        {
+            public Person(string id, string name, int votes)
+            {
+                Id = id;
+                Name = name;
+                Votes = votes;
+            }
+
+            public string Id { get; }
+            public string Name { get; }
+            public int Votes { get; }
         }
     }
 }

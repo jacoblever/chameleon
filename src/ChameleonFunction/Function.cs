@@ -13,8 +13,10 @@ using ChameleonFunction.StartGame;
 
 namespace ChameleonFunction
 {
+    // ReSharper disable once UnusedMember.Global
     public class Function
     {
+        // ReSharper disable once UnusedMember.Global
         public APIGatewayProxyResponse FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
         {
             var endpoint = string.Join('/', request.Path.Split("/").Skip(2));
@@ -35,6 +37,10 @@ namespace ChameleonFunction
                 case "start-game/":
                     return Respond(request, "POST", ()
                         => new StartGameHandler().Handle(request, context));
+                case "vote":
+                case "vote/":
+                    return Respond(request, "POST", ()
+                        => new VoteHandler().Handle(request, context));
                 case "leave-room":
                 case "leave-room/":
                     return Respond(request, "POST", ()
