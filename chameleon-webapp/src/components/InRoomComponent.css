@@ -23,6 +23,34 @@
   font-weight: bold;
 }
 
+.InRoom-voting {
+  margin-top: 20px;
+}
+
+.InRoom-voting ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.InRoom-voting li {
+  margin-top: 10px;
+}
+
+.InRoom-voting input[type="radio"] {
+  display: none;
+}
+
+.InRoom-voting label {
+  display: inline-block;
+  padding: 4px 11px;
+  font-size: 120%;
+  cursor: pointer;
+}
+
+.InRoom-voting input[type="radio"]:checked+label {
+  background-color: #bbb;
+}
+
 .InRoom-what_to_do {
   margin-top: 30px;
   font-size: 90%;

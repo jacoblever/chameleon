@@ -62,6 +62,16 @@ namespace DataStore
         {
             _dynamoModel.PersonByPersonId.Remove(personId);
         }
+        
+        public string GetVotedFor(string personId)
+        {
+            return _dynamoModel.PersonByPersonId[personId].VotedFor;
+        }
+        
+        public void SetVotedFor(string personId, string vote)
+        {
+            _dynamoModel.PersonByPersonId[personId].VotedFor = vote;
+        }
 
         public void SetCharacter(string personId, string character)
         {
@@ -101,10 +111,11 @@ namespace DataStore
 
             internal class Person
             {
+                public DateTime DateAddedUtc { get; }
                 public string Name { get; set; }
-                public DateTime DateAddedUtc { get; set; }
                 public string Character { get; set; }
                 public bool GoesFirst { get; set; }
+                public string VotedFor { get; set; }
             }
         }
     }
