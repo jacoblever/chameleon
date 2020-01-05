@@ -111,7 +111,7 @@ namespace DataStore
 
             internal class Person
             {
-                public DateTime DateAddedUtc { get; }
+                public DateTime DateAddedUtc { get; set; }
                 public string Name { get; set; }
                 public string Character { get; set; }
                 public bool GoesFirst { get; set; }
