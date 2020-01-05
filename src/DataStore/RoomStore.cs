@@ -88,6 +88,10 @@ namespace DataStore
         public void StartGame(string roomCode, string word, ISet<string> chameleons, string firstPersonId)
         {
             var room = GetRoom(roomCode);
+            foreach (var id in room.PersonIds)
+            {
+                room.SetVotedFor(id, null);
+            }
             foreach (var personId in room.PersonIds.Select(x => x).ToList())
             {
                 room.SetCharacter(personId,
@@ -108,6 +112,13 @@ namespace DataStore
         {
             var room = GetRoom(roomCode);
             room.RemovePerson(personId);
+            Save(room);
+        }
+
+        public void Vote(string roomCode, string personId, string vote)
+        {
+            var room = GetRoom(roomCode);
+            room.SetVotedFor(personId, vote);
             Save(room);
         }
     }

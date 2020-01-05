@@ -10,5 +10,6 @@ namespace DataStore
         void StartGame(string roomCode, string word, ISet<string> chameleons, string firstPersonId);
         Room GetRoom(string roomCode);
         void RemovePersonFromRoom(string roomCode, string personId);
+        void Vote(string roomCode, string personId, string vote);
     }
 }

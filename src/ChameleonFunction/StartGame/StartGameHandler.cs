@@ -10,10 +10,9 @@ namespace ChameleonFunction.StartGame
         {
             return new Responder().Respond(response =>
             {
-                var roomCode = request.QueryStringParameters["RoomCode"];
-                var personId = request.GetChameleonPersonIdHeader();
-
-                ChameleonGame.Create().StartGame(roomCode, personId);
+                ChameleonGame.Create().StartGame(
+                    request.GetChameleonRoomCode(),
+                    request.GetChameleonPersonIdHeader());
                 response.StatusCode = 204;
                 response.Body = "";
             });
