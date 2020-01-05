@@ -11,10 +11,9 @@ namespace ChameleonFunction.RoomStatus
         {
             return new Responder().Respond(response =>
             {
-                var roomCode = request.QueryStringParameters["RoomCode"];
-                var personId = request.GetChameleonPersonIdHeader();
-
-                var status = ChameleonGame.Create().GetRoomStatus(roomCode, personId);
+                var status = ChameleonGame.Create().GetRoomStatus(
+                    request.GetChameleonRoomCode(),
+                    request.GetChameleonPersonIdHeader());
                 response.StatusCode = 200;
                 response.Body = JsonConvert.SerializeObject(status);
                 response.Headers.Add("Content-Type", "application/json");

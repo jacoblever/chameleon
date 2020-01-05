@@ -45,21 +45,33 @@ namespace GameLogic
             {
                 throw new RoomDoesNotExistException(roomCode);
             }
-            ThrowUnlessPersonInRoom(roomCode, personId, room);
+            ThrowUnlessPersonInRoom(personId, room);
 
             var name = room.GetNameFor(personId);
             var peopleCount = room.PersonIds.Count;
             var myCharacter = room.GetCharacterFor(personId);
-            var peopleNames = room.PersonIds.Select(x => room.GetNameFor(x)).ToList();
+            var votesByPerson = room.PersonIds
+                .Where(x => room.GetVotedFor(x) != null)   
+                .GroupBy(x => room.GetVotedFor(x))
+                .ToDictionary(x => x.Key, x => x.Count());
+            var people = room.PersonIds
+                .Select(x =>
+                {
+                    votesByPerson.TryGetValue(x, out var votes);
+                    return new RoomStatus.Person(x, room.GetNameFor(x), votes);
+                })
+                .ToList();
+            var everyoneVoted = room.PersonIds.All(x => room.GetVotedFor(x) != null || room.GetCharacterFor(x) == "chameleon");
 
             return new RoomStatus(
                 code: roomCode,
                 name: name,
-                peopleInRoom: peopleNames,
+                peopleInRoom: people,
                 peopleCount: peopleCount,
                 chameleonCount: GetChameleonCount(peopleCount),
                 state: myCharacter == null ? RoomState.PreGame.ToString() : RoomState.InGame.ToString(),
                 character: myCharacter,
+                everyoneVoted: everyoneVoted,
                 showStartGameButton: room.OldestPersonId == personId,
                 firstPersonName: myCharacter == null ? null : room.WhoGoesFirstByName());
         }
@@ -67,7 +79,7 @@ namespace GameLogic
         public void StartGame(string roomCode, string personId)
         {
             var room = _roomStore.GetRoom(roomCode);
-            ThrowUnlessPersonInRoom(roomCode, personId, room);
+            ThrowUnlessPersonInRoom(personId, room);
             var word = new Words().GetRandomWord();
 
             var random = new Random();
@@ -97,19 +109,30 @@ namespace GameLogic
             return weightedPersonIds[randomIndex];
         }
 
+        public void Vote(string roomCode, string personId, string vote)
+        {
+            var room = _roomStore.GetRoom(roomCode);
+            ThrowUnlessPersonInRoom(personId, room);
+            if (room.GetCharacterFor(personId) == "chameleon")
+            {
+                throw new ChameleonCannotVoteException();
+            }
+            _roomStore.Vote(roomCode, personId, vote);
+        }
+
         public void LeaveRoom(string roomCode, string personId)
         {
             var room = _roomStore.GetRoom(roomCode);
-            ThrowUnlessPersonInRoom(roomCode, personId, room);
+            ThrowUnlessPersonInRoom(personId, room);
             _roomStore.RemovePersonFromRoom(roomCode, personId);
         }
 
-        private static void ThrowUnlessPersonInRoom(string roomCode, string personId, Room room)
+        private static void ThrowUnlessPersonInRoom(string personId, Room room)
         {
             if (!room.PersonIds.Contains(personId))
             {
                 throw new PersonNotInRoomException(
-                    $"Person {personId} not in room {roomCode}, people in room {string.Join(',', room.PersonIds)}");
+                    $"Person {personId} not in room {room.RoomCode}, people in room {string.Join(',', room.PersonIds)}");
             }
         }
 

@@ -1,20 +1,23 @@
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using GameLogic;
+using Newtonsoft.Json.Linq;
 
-namespace ChameleonFunction.LeaveRoom
+namespace ChameleonFunction
 {
-    public class LeaveRoomHandler
+    public class VoteHandler
     {
         public APIGatewayProxyResponse Handle(APIGatewayProxyRequest request, ILambdaContext context)
         {
             return new Responder().Respond(response =>
             {
-                ChameleonGame.Create().LeaveRoom(
+                var body = JObject.Parse(request.Body);
+                var voteToken = body["Vote"];
+
+                ChameleonGame.Create().Vote(
                     request.GetChameleonRoomCode(),
-                    request.GetChameleonPersonIdHeader());
-                response.StatusCode = 204;
-                response.Body = "";
+                    request.GetChameleonPersonIdHeader(),
+                    voteToken.ToString());
             });
         }
     }
