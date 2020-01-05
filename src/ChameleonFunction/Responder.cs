@@ -7,7 +7,9 @@ namespace ChameleonFunction
 {
     public class Responder
     {
-        public APIGatewayProxyResponse Respond(Action<APIGatewayProxyResponse> handler)
+        public delegate void Handler(APIGatewayProxyResponse response);
+        
+        public APIGatewayProxyResponse Respond(Handler handler)
         {
             var response = new APIGatewayProxyResponse
             {
