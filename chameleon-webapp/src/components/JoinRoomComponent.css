@@ -2,3 +2,12 @@
   color: red;
   font-size: 80%;
 }
+
+.JoinRoom-room_code_input {
+  text-transform: uppercase;
+}
+
+
+.JoinRoom-room_code_input::placeholder {
+  text-transform: none;
+}
