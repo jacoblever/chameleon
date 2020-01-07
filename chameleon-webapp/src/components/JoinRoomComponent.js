@@ -60,11 +60,11 @@ class JoinRoomComponent extends React.Component {
   }
 
   handleRoomChange(event) {
-    this.setState({roomCodeInput: event.target.value});
+    this.setState({ roomCodeInput: event.target.value.toUpperCase() });
   }
 
   handlePersonChange(event) {
-    this.setState({personNameInput: event.target.value});
+    this.setState({ personNameInput: event.target.value });
   }
 
   handleRoomCodeKeyUp(event) {
@@ -92,6 +92,7 @@ class JoinRoomComponent extends React.Component {
           onChange={this.handleRoomChange}
           onKeyUp={this.handleRoomCodeKeyUp}
           tabIndex="2"
+          className="JoinRoom-room_code_input"
           placeholder="Enter room code" />
         <button onClick={this.joinRoom} tabIndex="3">
           Join
