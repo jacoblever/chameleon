@@ -167,19 +167,27 @@ class InRoomComponent extends React.Component {
     return 0;
   }
 
+  nameComparer(a, b) {
+    return ('' + a.Name).localeCompare(b.Name);
+  }
+
   votingComponent() {
     if (this.state.everyoneVoted) {
       return <div className="InRoom-voting">
         <div>The votes are in!</div>
         <ul>
-          {this.state.people.sort(this.mostVotesComparer).filter(x => x.Votes > 0).map(person => {
-            let message = person.Votes === 1
-              ? `${person.Name} - ${person.Votes} Vote`
-              : `${person.Name} - ${person.Votes} Votes`
-            return (
-              <li key={person.Id}>{message}</li>
-            )
-          })}
+          {this.state.people
+            .sort(this.nameComparer)
+            .sort(this.mostVotesComparer)
+            .filter(x => x.Votes > 0)
+            .map(person => {
+              let message = person.Votes === 1
+                ? `${person.Name} - ${person.Votes} Vote`
+                : `${person.Name} - ${person.Votes} Votes`
+              return (
+                <li key={person.Id}>{message}</li>
+              )
+            })}
         </ul>
       </div>
     }
@@ -189,21 +197,24 @@ class InRoomComponent extends React.Component {
     return <div className="InRoom-voting">
       <div>Choose someone you think is a Chameleon:</div>
       <ul>
-        {this.state.people.map(person => {
-          let checkboxId = `checkbox-chameleon-guess-${person.Id}`
-          return <li key={person.Id}>
-            <input
-              type="radio"
-              name="chameleon-guess"
-              value={person.Id}
-              onChange={this.voteChange}
-              id={checkboxId} />
-            <label
-              htmlFor={checkboxId} >
-              {person.Name}
-            </label>
-          </li>
-        })}
+        {this.state.people
+          .sort(this.nameComparer)
+          .filter(x => x.Id !== this.props.personId)
+          .map(person => {
+            let checkboxId = `checkbox-chameleon-guess-${person.Id}`
+            return <li key={person.Id}>
+              <input
+                type="radio"
+                name="chameleon-guess"
+                value={person.Id}
+                onChange={this.voteChange}
+                id={checkboxId} />
+              <label
+                htmlFor={checkboxId} >
+                {person.Name}
+              </label>
+            </li>
+          })}
       </ul>
       <div>Results will show once everyone has voted.</div>
     </div>
