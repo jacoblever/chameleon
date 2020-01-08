@@ -20,6 +20,19 @@ deploy_steps: &deploy_steps
     - run: mkdir ~/.aws && echo -e "[default]\naws_access_key_id=$AWS_ACCESS_KEY_ID\naws_secret_access_key=$AWS_SECRET_ACCESS_KEY\n" > ~/.aws/credentials
     - run: cd ./src/ChameleonFunction/ && /root/.dotnet/tools/dotnet-lambda deploy-function ChameleonFunction --region "eu-west-1"
 
+sam_deploy_steps: &sam_deploy_steps
+  docker:
+    - image: mcr.microsoft.com/dotnet/core/sdk:2.1
+  steps:
+    - checkout
+    - run: find .
+    - run: apt update && apt -y install zip
+    - run: apt -y install awscli
+    - run: apt -y install aws-sam-cli
+    - run: mkdir ~/.aws && echo -e "[default]\naws_access_key_id=$AWS_ACCESS_KEY_ID\naws_secret_access_key=$AWS_SECRET_ACCESS_KEY\n" > ~/.aws/credentials
+    - run: sam build
+    - run: sam deploy
+
 webapp_test_steps: &webapp_test_steps
   docker:
     - image: docker:stable-git
@@ -41,10 +54,6 @@ webapp_push_to_s3_steps: &webapp_push_to_s3_steps
   docker:
     - image: circleci/python:3.7-stretch
   working_directory: ~/circleci-docs
-
-  environment:
-    - S3_BUCKET_NAME: chameleon-game-webapp
-
   steps:
     - checkout
     - setup_remote_docker:
@@ -77,12 +86,20 @@ webapp_push_to_s3_steps: &webapp_push_to_s3_steps
 jobs:
   run_tests:
     <<: *test_steps
-  deploy:
+  deploy_backend_production:
     <<: *deploy_steps
+  deploy_backend_staging:
+    <<: *sam_deploy_steps
   run_webapp_test:
     <<: *webapp_test_steps
-  webapp_push_to_s3:
+  webapp_push_to_s3_production:
     <<: *webapp_push_to_s3_steps
+    environment:
+      - S3_BUCKET_NAME: chameleon-game-webapp
+  webapp_push_to_s3_staging:
+    <<: *webapp_push_to_s3_steps
+    environment:
+      - S3_BUCKET_NAME: chameleon-game-webapp-test
 
 workflows:
   version: 2
@@ -90,7 +107,7 @@ workflows:
     jobs:
       - run_tests
       - run_webapp_test
-      - webapp_push_to_s3:
+      - webapp_push_to_s3_production:
           requires:
             - run_tests
             - run_webapp_test
@@ -98,7 +115,15 @@ workflows:
             branches:
               only:
                 - master
-      - deploy:
+      - webapp_push_to_s3_staging:
+          requires:
+            - run_tests
+            - run_webapp_test
+          filters:
+            branches:
+              only:
+                - staging
+      - deploy_backend_production:
           requires:
             - run_tests
             - run_webapp_test
@@ -106,3 +131,11 @@ workflows:
             branches:
               only:
                 - master
+      - deploy_backend_staging:
+          requires:
+            - run_tests
+            - run_webapp_test
+          filters:
+            branches:
+              only:
+                - staging
