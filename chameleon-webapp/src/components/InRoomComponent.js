@@ -288,7 +288,7 @@ class InRoomComponent extends React.Component {
               </div>
             )}
             <div className="InRoom-leave">
-              <button onClick={this.leaveRoom}>Leave Room</button>
+              <button onClick={this.leaveRoom}>Join a different room</button>
             </div>
           </div>
         )}
