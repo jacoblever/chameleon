@@ -27,8 +27,9 @@ sam_deploy_steps: &sam_deploy_steps
     - checkout
     - run: find .
     - run: apt update && apt -y install zip
-    - run: apt -y install awscli
-    - run: apt -y install aws-sam-cli
+    - run: apt -y install python-pip
+    - run: pip install awscli
+    - run: pip install aws-sam-cli
     - run: mkdir ~/.aws && echo -e "[default]\naws_access_key_id=$AWS_ACCESS_KEY_ID\naws_secret_access_key=$AWS_SECRET_ACCESS_KEY\n" > ~/.aws/credentials
     - run: sam build
     - run: sam deploy
@@ -138,4 +139,4 @@ workflows:
           filters:
             branches:
               only:
-                - staging
+                - staging-2
