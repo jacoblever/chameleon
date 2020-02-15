@@ -60,9 +60,9 @@ Outputs:
   ChameleonApi:
     Description: "API Gateway endpoint URL for Prod stage for Join Room function"
     Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-    ChameleonFunction:
+  ChameleonFunction:
     Description: "Join Room Lambda Function ARN"
     Value: !GetAtt ChameleonFunction.Arn
-    ChameleonFunctionIamRole:
+  ChameleonFunctionIamRole:
     Description: "Implicit IAM Role created for Join Room function"
     Value: !GetAtt ChameleonFunctionRole.Arn
