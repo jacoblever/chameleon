@@ -27,3 +27,4 @@ workflows:
           stack-name: chameleon-game-test
           template: ./template.yaml
           s3-bucket: aws-sam-cli-managed-default-samclisourcebucket-1hoa4cv2sc075
+          use-container: false
