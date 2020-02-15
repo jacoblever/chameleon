@@ -7,6 +7,20 @@ jobs:
       - run: find .
       - run: dotnet restore
       - run: dotnet test --filter TestCategory!=DynamoTests
+  deploy:
+    executor: aws-serverless/default
+    steps:
+      - checkout
+      - aws-serverless/install
+      - run: wget -q https://packages.microsoft.com/config/ubuntu/19.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+      - run: sudo dpkg -i packages-microsoft-prod.deb
+      - run: sudo apt-get update
+      - run: sudo apt-get install apt-transport-https
+      - run: sudo apt-get update
+      - run: sudo apt-get install dotnet-sdk-2.1
+      - run: dotnet tool install -g Amazon.Lambda.Tools
+      - run: PATH=$PATH:~/.dotnet/tools sam build -t ./template.yaml --profile default --region $AWS_DEFAULT_REGION
+      - run: sam deploy
 
 version: 2.1
 orbs:
@@ -16,15 +30,10 @@ workflows:
   test_and_deploy:
     jobs:
       - run_tests
-      - aws-serverless/deploy:
-          name: deploy-backend-staging
+      - deploy:
           requires:
             - run_tests
           filters:
             branches:
               only:
                 - staging
-          stack-name: chameleon-game-test
-          template: ./template.yaml
-          s3-bucket: aws-sam-cli-managed-default-samclisourcebucket-1hoa4cv2sc075
-          use-container: false
