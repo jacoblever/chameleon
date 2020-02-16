@@ -1,9 +1,0 @@
-version = 0.1
-[default]
-[default.deploy]
-[default.deploy.parameters]
-stack_name = "chameleon-game-backend-staging"
-s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1hoa4cv2sc075"
-s3_prefix = "chameleon-game-backend-staging"
-region = "eu-west-1"
-capabilities = "CAPABILITY_IAM"

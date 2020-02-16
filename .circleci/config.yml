@@ -7,7 +7,23 @@ deploy_backend_production_steps: &deploy_backend_production_steps
     - run: apt update && apt -y install zip
     - run: dotnet tool install --global Amazon.Lambda.Tools
     - run: mkdir ~/.aws && echo -e "[default]\naws_access_key_id=$AWS_ACCESS_KEY_ID\naws_secret_access_key=$AWS_SECRET_ACCESS_KEY\n" > ~/.aws/credentials
-    - run: cd ./src/ChameleonFunction/ && /root/.dotnet/tools/dotnet-lambda deploy-function ChameleonFunction --region "eu-west-1"
+    - run: cd ./src/ChameleonFunction/ && /root/.dotnet/tools/dotnet-lambda deploy-function ChameleonFunction --region $AWS_DEFAULT_REGION
+
+deploy_backend_steps: &deploy_backend_steps
+  executor: aws-serverless/default
+  steps:
+    - checkout
+    - aws-serverless/install
+    - run: wget -q https://packages.microsoft.com/config/ubuntu/19.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+    - run: sudo dpkg -i packages-microsoft-prod.deb
+    - run: sudo apt-get update
+    - run: sudo apt-get install apt-transport-https
+    - run: sudo apt-get update
+    - run: sudo apt-get install dotnet-sdk-2.1
+    - run: dotnet tool install -g Amazon.Lambda.Tools
+    - run: PATH=$PATH:~/.dotnet/tools sam build -t ./template.yaml --profile default --region $AWS_DEFAULT_REGION
+    - run: sam deploy -t ./template.yaml --stack-name $STACK_NAME --s3-bucket $S3_BUCKET --s3-prefix $STACK_NAME --region $AWS_DEFAULT_REGION --capabilities CAPABILITY_IAM
+
 
 webapp_test_steps: &webapp_test_steps
   docker:
@@ -59,6 +75,7 @@ webapp_push_to_s3_steps: &webapp_push_to_s3_steps
             ./build/index.html s3://${S3_BUCKET_NAME} \
             --acl=public-read \
             --cache-control=no-cache
+  
 jobs:
   run_backend_tests:
     docker:
@@ -70,20 +87,11 @@ jobs:
       - run: dotnet test --filter TestCategory!=DynamoTests
 
   deploy_backend_staging:
-    executor: aws-serverless/default
-    steps:
-      - checkout
-      - aws-serverless/install
-      - run: wget -q https://packages.microsoft.com/config/ubuntu/19.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-      - run: sudo dpkg -i packages-microsoft-prod.deb
-      - run: sudo apt-get update
-      - run: sudo apt-get install apt-transport-https
-      - run: sudo apt-get update
-      - run: sudo apt-get install dotnet-sdk-2.1
-      - run: dotnet tool install -g Amazon.Lambda.Tools
-      - run: PATH=$PATH:~/.dotnet/tools sam build -t ./template.yaml --profile default --region $AWS_DEFAULT_REGION
-      - run: sam deploy
-
+    <<: *deploy_backend_steps
+    environment:
+      - STACK_NAME: chameleon-game-backend-staging
+      - S3_BUCKET: aws-sam-cli-managed-default-samclisourcebucket-1hoa4cv2sc075
+  
   deploy_backend_production:
     <<: *deploy_backend_production_steps
   
