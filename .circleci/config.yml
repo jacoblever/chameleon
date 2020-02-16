@@ -74,6 +74,7 @@ webapp_push_to_s3_steps: &webapp_push_to_s3_steps
         command: |
           cd ./chameleon-webapp
           docker build \
+            --build-arg ENV_FILE_POSTFIX \
             --tag chameleon-webapp .
           docker run --name chameleon-webapp-container chameleon-webapp true
           docker cp chameleon-webapp-container:/home/chameleon/chameleon-webapp/build ./build
@@ -120,11 +121,13 @@ jobs:
     <<: *webapp_push_to_s3_steps
     environment:
       - S3_BUCKET_NAME: chameleon-game-webapp-test
+      - ENV_FILE_POSTFIX: staging
 
   webapp_push_to_s3_production:
     <<: *webapp_push_to_s3_steps
     environment:
       - S3_BUCKET_NAME: chameleon-game-webapp
+      - ENV_FILE_POSTFIX: production
   
 version: 2.1
 orbs:
