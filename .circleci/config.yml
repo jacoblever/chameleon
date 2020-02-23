@@ -32,16 +32,20 @@ deploy_backend_steps: &deploy_backend_steps
             --profile default \
             --region $AWS_DEFAULT_REGION
     - run:
-        name: SAM Deploy 
+        name: Create SAM Config
         command: |
-          sam deploy \
-            -t ./template.yaml \
-            --stack-name $STACK_NAME \
-            --s3-bucket $S3_BUCKET \
-            --s3-prefix $STACK_NAME \
-            --region $AWS_DEFAULT_REGION \
-            --capabilities CAPABILITY_IAM
-
+          echo "version = 0.1" >> samconfig.toml
+          echo "[default]" >> samconfig.toml
+          echo "[default.deploy]" >> samconfig.toml
+          echo "[default.deploy.parameters]" >> samconfig.toml
+          echo "stack_name = \"$STACK_NAME\"" >> samconfig.toml
+          echo "s3_bucket = \"$S3_BUCKET\"" >> samconfig.toml
+          echo "s3_prefix = \"$STACK_NAME\"" >> samconfig.toml
+          echo "region = \"$AWS_DEFAULT_REGION\"" >> samconfig.toml
+          echo "capabilities = \"CAPABILITY_IAM\"" >> samconfig.toml
+    - run:
+        name: SAM Deploy 
+        command: sam deploy
 
 webapp_test_steps: &webapp_test_steps
   docker:
