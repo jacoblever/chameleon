@@ -1,6 +1,8 @@
-version: 2
+version: 2.1
+orbs:
+  aws-serverless: circleci/aws-serverless@1.0.2
 
-test_steps: &test_steps
+test_backend_steps: &test_backend_steps
   docker:
     - image: mcr.microsoft.com/dotnet/core/sdk:2.1
   steps:
@@ -9,7 +11,7 @@ test_steps: &test_steps
     - run: dotnet restore
     - run: dotnet test --filter TestCategory!=DynamoTests
 
-deploy_steps: &deploy_steps
+deploy_backend_production_steps: &deploy_backend_production_steps
   docker:
     - image: mcr.microsoft.com/dotnet/core/sdk:2.1
   steps:
@@ -18,9 +20,9 @@ deploy_steps: &deploy_steps
     - run: apt update && apt -y install zip
     - run: dotnet tool install --global Amazon.Lambda.Tools
     - run: mkdir ~/.aws && echo -e "[default]\naws_access_key_id=$AWS_ACCESS_KEY_ID\naws_secret_access_key=$AWS_SECRET_ACCESS_KEY\n" > ~/.aws/credentials
-    - run: cd ./src/ChameleonFunction/ && /root/.dotnet/tools/dotnet-lambda deploy-function ChameleonFunction --region "eu-west-1"
+    - run: cd ./src/ChameleonFunction/ && /root/.dotnet/tools/dotnet-lambda deploy-function ChameleonFunction --region $AWS_DEFAULT_REGION
 
-webapp_test_steps: &webapp_test_steps
+test_frontend_steps: &test_frontend_steps
   docker:
     - image: docker:stable-git
   steps:
@@ -37,14 +39,51 @@ webapp_test_steps: &webapp_test_steps
         command: |
           cd ./chameleon-webapp && docker run --env CI=true chameleon-webapp npm test
 
-webapp_push_to_s3_steps: &webapp_push_to_s3_steps
+deploy_backend_steps: &deploy_backend_steps
+  executor: aws-serverless/default
+  steps:
+    - checkout
+    - aws-serverless/install
+    - run:
+        name:  Install .NET Core cli
+        command: |
+          wget -q https://packages.microsoft.com/config/ubuntu/19.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+          sudo dpkg -i packages-microsoft-prod.deb
+          sudo apt-get update
+          sudo apt-get install apt-transport-https
+          sudo apt-get update
+          sudo apt-get install dotnet-sdk-2.1
+          dotnet tool install -g Amazon.Lambda.Tools
+    - run:
+        name: SAM Build 
+        command: |
+          PATH=$PATH:~/.dotnet/tools sam build \
+            -t ./template.yaml \
+            --profile default \
+            --region $AWS_DEFAULT_REGION
+    - run:
+        name: Create SAM Config
+        command: |
+          echo "version = 0.1" >> samconfig.toml
+          echo "[default]" >> samconfig.toml
+          echo "[default.deploy]" >> samconfig.toml
+          echo "[default.deploy.parameters]" >> samconfig.toml
+          echo "stack_name = \"$STACK_NAME\"" >> samconfig.toml
+          echo "s3_bucket = \"$S3_BUCKET\"" >> samconfig.toml
+          echo "s3_prefix = \"$STACK_NAME\"" >> samconfig.toml
+          echo "region = \"$AWS_DEFAULT_REGION\"" >> samconfig.toml
+          echo "capabilities = \"CAPABILITY_IAM\"" >> samconfig.toml
+    - run:
+        name: SAM Deploy 
+        command: |
+          sam deploy \
+            --parameter-overrides ApiDomain=$BACKEND_DOMAIN \
+            --no-fail-on-empty-changeset
+
+deploy_frontend_steps: &deploy_frontend_steps
   docker:
     - image: circleci/python:3.7-stretch
   working_directory: ~/circleci-docs
-
-  environment:
-    - S3_BUCKET_NAME: chameleon-game-webapp
-
   steps:
     - checkout
     - setup_remote_docker:
@@ -55,6 +94,7 @@ webapp_push_to_s3_steps: &webapp_push_to_s3_steps
         command: |
           cd ./chameleon-webapp
           docker build \
+            --build-arg ENV_FILE_POSTFIX \
             --tag chameleon-webapp .
           docker run --name chameleon-webapp-container chameleon-webapp true
           docker cp chameleon-webapp-container:/home/chameleon/chameleon-webapp/build ./build
@@ -74,34 +114,84 @@ webapp_push_to_s3_steps: &webapp_push_to_s3_steps
             ./build/index.html s3://${S3_BUCKET_NAME} \
             --acl=public-read \
             --cache-control=no-cache
+  
 jobs:
-  run_tests:
-    <<: *test_steps
-  deploy:
-    <<: *deploy_steps
-  run_webapp_test:
-    <<: *webapp_test_steps
-  webapp_push_to_s3:
-    <<: *webapp_push_to_s3_steps
+  run_backend_tests:
+    <<: *test_backend_steps
+
+  deploy_backend_staging:
+    <<: *deploy_backend_steps
+    environment:
+      - STACK_NAME: chameleon-game-backend-staging
+      - BACKEND_DOMAIN: chameleon-api-staging.jacoblever.dev
+      - S3_BUCKET: aws-sam-cli-managed-default-samclisourcebucket-1hoa4cv2sc075
+  
+  deploy_backend_production:
+    <<: *deploy_backend_steps
+    environment:
+      - STACK_NAME: chameleon-game-backend-production
+      - BACKEND_DOMAIN: chameleon-api.jacoblever.dev
+      - S3_BUCKET: aws-sam-cli-managed-default-samclisourcebucket-1hoa4cv2sc075
+
+  deploy_backend_production_lagacy:
+    <<: *deploy_backend_production_steps
+  
+  run_frontend_tests:
+    <<: *test_frontend_steps
+
+  deploy_frontend_staging:
+    <<: *deploy_frontend_steps
+    environment:
+      - S3_BUCKET_NAME: chameleon-game-webapp-test
+      - ENV_FILE_POSTFIX: staging
+
+  deploy_frontend_production:
+    <<: *deploy_frontend_steps
+    environment:
+      - S3_BUCKET_NAME: chameleon-game-webapp
+      - ENV_FILE_POSTFIX: production
 
 workflows:
-  version: 2
   test_and_deploy:
     jobs:
-      - run_tests
-      - run_webapp_test
-      - webapp_push_to_s3:
+      - run_backend_tests
+      - run_frontend_tests
+      - deploy_backend_staging:
           requires:
-            - run_tests
-            - run_webapp_test
+            - run_backend_tests
+            - run_frontend_tests
+          filters:
+            branches:
+              only:
+                - staging
+      - deploy_backend_production:
+          requires:
+            - run_backend_tests
+            - run_frontend_tests
           filters:
             branches:
               only:
                 - master
-      - deploy:
+      - deploy_backend_production_lagacy:
           requires:
-            - run_tests
-            - run_webapp_test
+            - run_backend_tests
+            - run_frontend_tests
+          filters:
+            branches:
+              only:
+                - master
+      - deploy_frontend_staging:
+          requires:
+            - run_backend_tests
+            - run_frontend_tests
+          filters:
+            branches:
+              only:
+                - staging
+      - deploy_frontend_production:
+          requires:
+            - run_backend_tests
+            - run_frontend_tests
           filters:
             branches:
               only:
