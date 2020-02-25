@@ -74,6 +74,6 @@ Resources:
     DependsOn: ApiGatewayApiliveStage
 
 Outputs:
-  ChameleonFunctionIamRole:
-    Description: "The cloudfront URL for this deployment"
+  ChameleonCloudFrontDomain:
+    Description: "The CloudFront URL for this deployment"
     Value: !GetAtt ChameleonDomain.DistributionDomainName
