@@ -1,7 +1,12 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Sample SAM Template for chameleon-game
+  The chameleon game
+
+Parameters:
+  ApiDomain:
+    Type: String
+    Description: The domain to use for this API
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
@@ -18,6 +23,14 @@ Globals:
         DYNAMO_DB_TABLE_NAME: !Ref ChameleonDynamoTable
 
 Resources:
+  ChameleonDomain:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      CertificateArn: arn:aws:acm:us-east-1:350413574090:certificate/f316a1cb-dcb1-41a8-aa48-ea2ad9c1ab91
+      DomainName: !Ref ApiDomain
+      EndpointConfiguration: 
+        Types: 
+          - EDGE
   ChameleonDynamoTable: # The database must defined before the lambda functions
     Type: AWS::DynamoDB::Table
     Properties: 
@@ -52,17 +65,15 @@ Resources:
             RestApiId: !Ref ApiGatewayApi
             Path: /api-2/{proxy+}
             Method: any
+  DomainApiBasePathMapping:  
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties: 
+      DomainName: !Ref ApiDomain
+      RestApiId: !Ref ApiGatewayApi
+      Stage: live
+    DependsOn: ApiGatewayApiliveStage
 
 Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  ChameleonApi:
-    Description: "API Gateway endpoint URL for Prod stage for Join Room function"
-    Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  ChameleonFunction:
-    Description: "Join Room Lambda Function ARN"
-    Value: !GetAtt ChameleonFunction.Arn
   ChameleonFunctionIamRole:
-    Description: "Implicit IAM Role created for Join Room function"
-    Value: !GetAtt ChameleonFunctionRole.Arn
+    Description: "The cloudfront URL for this deployment"
+    Value: !GetAtt ChameleonDomain.DistributionDomainName

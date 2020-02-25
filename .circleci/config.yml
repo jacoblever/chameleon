@@ -45,7 +45,9 @@ deploy_backend_steps: &deploy_backend_steps
           echo "capabilities = \"CAPABILITY_IAM\"" >> samconfig.toml
     - run:
         name: SAM Deploy 
-        command: sam deploy
+        command: |
+          sam deploy \
+            --parameter-overrides ApiDomain=$BACKEND_DOMAIN
 
 webapp_test_steps: &webapp_test_steps
   docker:
@@ -113,9 +115,17 @@ jobs:
     <<: *deploy_backend_steps
     environment:
       - STACK_NAME: chameleon-game-backend-staging
+      - BACKEND_DOMAIN: chameleon-api-staging.jacoblever.dev
       - S3_BUCKET: aws-sam-cli-managed-default-samclisourcebucket-1hoa4cv2sc075
   
   deploy_backend_production:
+    <<: *deploy_backend_steps
+    environment:
+      - STACK_NAME: chameleon-game-backend-production
+      - BACKEND_DOMAIN: chameleon-api.jacoblever.dev
+      - S3_BUCKET: aws-sam-cli-managed-default-samclisourcebucket-1hoa4cv2sc075
+
+  deploy_backend_production_lagacy:
     <<: *deploy_backend_production_steps
   
   run_webapp_test:
@@ -151,6 +161,14 @@ workflows:
               only:
                 - staging
       - deploy_backend_production:
+          requires:
+            - run_backend_tests
+            - run_webapp_test
+          filters:
+            branches:
+              only:
+                - master
+      - deploy_backend_production_lagacy:
           requires:
             - run_backend_tests
             - run_webapp_test
