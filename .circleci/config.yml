@@ -77,7 +77,8 @@ deploy_backend_steps: &deploy_backend_steps
         name: SAM Deploy 
         command: |
           sam deploy \
-            --parameter-overrides ApiDomain=$BACKEND_DOMAIN
+            --parameter-overrides ApiDomain=$BACKEND_DOMAIN \
+            --no-fail-on-empty-changeset
 
 deploy_frontend_steps: &deploy_frontend_steps
   docker:
