@@ -22,6 +22,23 @@ deploy_backend_production_steps: &deploy_backend_production_steps
     - run: mkdir ~/.aws && echo -e "[default]\naws_access_key_id=$AWS_ACCESS_KEY_ID\naws_secret_access_key=$AWS_SECRET_ACCESS_KEY\n" > ~/.aws/credentials
     - run: cd ./src/ChameleonFunction/ && /root/.dotnet/tools/dotnet-lambda deploy-function ChameleonFunction --region $AWS_DEFAULT_REGION
 
+test_frontend_steps: &test_frontend_steps
+  docker:
+    - image: docker:stable-git
+  steps:
+    - checkout
+    - setup_remote_docker:
+        reusable: true
+        version: 17.11.0-ce
+    - run:
+        name: Build application Docker image
+        command: |
+          cd ./chameleon-webapp && docker build -t chameleon-webapp .
+    - run:
+        name: Run tests
+        command: |
+          cd ./chameleon-webapp && docker run --env CI=true chameleon-webapp npm test
+
 deploy_backend_steps: &deploy_backend_steps
   executor: aws-serverless/default
   steps:
@@ -61,23 +78,6 @@ deploy_backend_steps: &deploy_backend_steps
         command: |
           sam deploy \
             --parameter-overrides ApiDomain=$BACKEND_DOMAIN
-
-test_frontend_steps: &test_frontend_steps
-  docker:
-    - image: docker:stable-git
-  steps:
-    - checkout
-    - setup_remote_docker:
-        reusable: true
-        version: 17.11.0-ce
-    - run:
-        name: Build application Docker image
-        command: |
-          cd ./chameleon-webapp && docker build -t chameleon-webapp .
-    - run:
-        name: Run tests
-        command: |
-          cd ./chameleon-webapp && docker run --env CI=true chameleon-webapp npm test
 
 deploy_frontend_steps: &deploy_frontend_steps
   docker:
