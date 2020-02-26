@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Amazon.Lambda.APIGatewayEvents;
 
 namespace ChameleonFunction.Routing
@@ -21,8 +22,12 @@ namespace ChameleonFunction.Routing
 
         public APIGatewayProxyResponse Handle(APIGatewayProxyRequest request)
         {
-            return _routes.ContainsKey(request.Path)
-                ? _routes[request.Path].Handle(request.HttpMethod)
+            var segments = request.Path
+                .Split('/')
+                .Where(x => !string.IsNullOrEmpty(x));
+            var path = string.Join("/", segments);
+            return _routes.ContainsKey(path)
+                ? _routes[path].Handle(request.HttpMethod)
                 : NotFoundResponse(request.Path);
         }
 
