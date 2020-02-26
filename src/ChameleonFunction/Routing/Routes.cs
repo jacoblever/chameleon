@@ -25,7 +25,7 @@ namespace ChameleonFunction.Routing
             var segments = request.Path
                 .Split('/')
                 .Where(x => !string.IsNullOrEmpty(x));
-            var path = string.Join("/", segments);
+            var path = "/" + string.Join("/", segments);
             return _routes.ContainsKey(path)
                 ? _routes[path].Handle(request.HttpMethod)
                 : NotFoundResponse(request.Path);
