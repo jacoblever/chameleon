@@ -63,7 +63,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref ApiGatewayApi
-            Path: /api-2/{proxy+}
+            Path: /{proxy+}
             Method: any
   DomainApiBasePathMapping:  
     Type: AWS::ApiGateway::BasePathMapping
