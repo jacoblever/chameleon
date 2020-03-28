@@ -55,6 +55,7 @@ namespace GameLogic
                 .GroupBy(x => room.GetVotedFor(x))
                 .ToDictionary(x => x.Key, x => x.Count());
             var people = room.PersonIds
+                .OrderBy(x => x)
                 .Select(x =>
                 {
                     votesByPerson.TryGetValue(x, out var votes);
