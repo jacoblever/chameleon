@@ -161,7 +161,7 @@ class InRoomComponent extends React.Component {
     return <div className="InRoom-order_of_play">
       {`Player order: ${this.state.firstPersonName}, `}
       {this.state.people
-        .filter(x => x.Name != this.state.firstPersonName)
+        .filter(x => x.Name !== this.state.firstPersonName)
         .map(person => person.Name)
         .join(", ")}
     </div>
