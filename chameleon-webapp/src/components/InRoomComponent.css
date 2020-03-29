@@ -1,10 +1,25 @@
-.InRoom-game_area {
-  width: 70vw;
-}
-
 .InRoom-room_code {
   text-align: right;
   margin-bottom: 20px;
+}
+
+.InRoom-leader_board {
+  margin-bottom: 0px;
+  margin-top: 0px;
+  background-color: blue;
+  border: 1px solid black;
+  width: fit-content;
+  padding: 10px;
+  margin: 0 auto;
+}
+
+.InRoom-leader_board ol {
+  list-style: none;
+  padding-left: 0;
+}
+
+.InRoom-leader_board li {
+  margin-top: 0px;
 }
 
 .InRoom-room_code-code {
@@ -62,4 +77,8 @@
 
 .InRoom-leave {
   margin-top: 30px;
+}
+
+.InRoom-footer {
+  margin-bottom: 30px;
 }
