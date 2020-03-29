@@ -18,6 +18,9 @@ namespace ChameleonFunction
                     request.GetChameleonRoomCode(),
                     request.GetChameleonPersonIdHeader(),
                     voteToken.ToString());
+                
+                response.StatusCode = 204;
+                response.Body = "";
             });
         }
     }
