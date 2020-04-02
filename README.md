@@ -2,6 +2,16 @@
 
 Powers [https://chameleon.jacoblever.dev/](https://chameleon.jacoblever.dev/)
 
+## Description of the game
+
+Players join the same room by entering the room code, then start a game. You need 3 or more people to play.
+
+Everyone in the game is given the same word, apart from the chameleon. The players take it in turns to say a single word that relates to the word given. The chameleon tries to blend in and hide the fact that they don't know the word. At the end of the round, players then guess who they think the chameleon is.
+
+## Code
+
+The code base is made up of a C# backend (in the src/ directory) and a JavaScript frontend (in chameleon-webapp/src/ directory)
+
 ## Installation instructions
 Install the following:
 * .NET Core 2.1 https://dotnet.microsoft.com/download/dotnet-core/2.1
