@@ -54,6 +54,7 @@ namespace DataStore
             {
                 DateAddedUtc = DateTime.UtcNow,
                 Name = personName,
+                Score = 0,
                 Character = null
             });
         }
@@ -77,6 +78,16 @@ namespace DataStore
         {
             _dynamoModel.PersonByPersonId[personId].Character = character;
         }
+        
+        public void AddScore(string personId, int score)
+        {
+            _dynamoModel.PersonByPersonId[personId].Score += score;
+        }
+        
+        public int GetScoreFor(string personId)
+        {
+            return _dynamoModel.PersonByPersonId[personId].Score;
+        }
 
         public string GetCharacterFor(string personId)
         {
@@ -90,6 +101,7 @@ namespace DataStore
                 _dynamoModel.PersonByPersonId[id].GoesFirst = id == personId;
             }
         }
+        
 
         public string WhoGoesFirstByName()
         {
@@ -113,10 +125,12 @@ namespace DataStore
             {
                 public DateTime DateAddedUtc { get; set; }
                 public string Name { get; set; }
+                public int Score { get; set; }
                 public string Character { get; set; }
                 public bool GoesFirst { get; set; }
                 public string VotedFor { get; set; }
             }
         }
+        
     }
 }

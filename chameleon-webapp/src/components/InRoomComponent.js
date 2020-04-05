@@ -177,30 +177,21 @@ class InRoomComponent extends React.Component {
     return 0;
   }
 
+  highestScoreComparer(a,b) {
+    if (a.Score > b.Score) {
+      return -1;
+    }
+    if (b.Score > a.Score) {
+      return 1;
+    }
+    return 0;
+  }
+
   nameComparer(a, b) {
     return ('' + a.Name).localeCompare(b.Name);
   }
 
   votingComponent() {
-    if (this.state.everyoneVoted) {
-      return <div className="InRoom-voting">
-        <div>The votes are in!</div>
-        <ul>
-          {this.state.people
-            .sort(this.nameComparer)
-            .sort(this.mostVotesComparer)
-            .filter(x => x.Votes > 0)
-            .map(person => {
-              let message = person.Votes === 1
-                ? `${person.Name} - ${person.Votes} Vote`
-                : `${person.Name} - ${person.Votes} Votes`
-              return (
-                <li key={person.Id}>{message}</li>
-              )
-            })}
-        </ul>
-      </div>
-    }
     if (this.state.character === "chameleon") {
       return <div className="InRoom-voting">Chameleons can't vote! Results will show once everyone else has voted.</div>
     }
@@ -230,6 +221,46 @@ class InRoomComponent extends React.Component {
     </div>
   }
 
+  voteResultsComponent() {
+    return <div className="InRoom-voting">
+        <div>The votes are in!</div>
+        <ul>
+          {this.state.people
+            .sort(this.nameComparer)
+            .sort(this.mostVotesComparer)
+            .filter(x => x.Votes > 0)
+            .map(person => {
+              let message = person.Votes === 1
+                ? `${person.Name} - ${person.Votes} Vote`
+                : `${person.Name} - ${person.Votes} Votes`
+              return (
+                <li key={person.Id}>{message}</li>
+              )
+            })}
+        </ul>
+      </div>
+  }
+
+  leaderBoardComponent() {
+    return <div>
+        <div className="InRoom-leader_board">
+        <div>Leader Board:</div>
+        <ol>
+          {this.state.people
+            .sort(this.highestScoreComparer)
+            .map(person => {
+              let message = person.Score === 1
+                ? `${person.Name} - ${person.Score} Point`
+                : `${person.Name} - ${person.Score} Points`
+              return (
+                <li key={person.Id}>{message}</li>
+              )
+            })}
+        </ol>
+      </div>
+    </div>
+  }
+
   voteChange(e) {
     fetch(Config.backendBaseApiUrl() + 'vote/?RoomCode=' + this.props.roomCode, {
       method: 'POST',
@@ -244,64 +275,84 @@ class InRoomComponent extends React.Component {
     .catch((error) => { console.error(error); });
   }
 
-  render() {
-    return (
-      <div className="InRoom-game_area">
-        {this.state.roomState === null ? (
-          <div>Loading game...</div>
+  inGameComponent() {
+    return <div className="InRoom-game_area">
+      <div>
+        {this.state.roomState === "PreGame" ? (
+          <div>
+            <div>
+              {this.welcomeMessage()}
+            </div>
+            {this.state.numberOfPeopleInRoom >= 3 && this.state.showStartGameButton && 
+              <button onClick={this.startGame}>Start Game</button>
+            }
+          </div>
         ) : (
           <div>
-            {this.state.roomOld && 
-              <div>Still playing? <a href={window.location} className="Chameleon-link">Refresh</a></div>
-            }
-            <div className="InRoom-room_code">
-              Room code: <span className="InRoom-room_code-code">{this.props.roomCode}</span>
-              <br />
-              Players: {this.state.numberOfPeopleInRoom}
+            <div>The word is</div>
+            <div className="InRoom-character">
+              {this.state.character === "chameleon" ? "???" : this.state.character}
             </div>
-            {this.state.roomState === "PreGame" ? (
-              <div>
-                <div>
-                  {this.welcomeMessage()}
-                </div>
-                {this.state.numberOfPeopleInRoom >= 3 && this.state.showStartGameButton && 
-                  <button onClick={this.startGame}>Start Game</button>
-                }
-              </div>
-            ) : (
-              <div>
-                <div>The word is</div>
-                <div className="InRoom-character">
-                  {this.state.character === "chameleon" ? "???" : this.state.character}
-                </div>
-                <div>
-                  {this.state.character === "chameleon" && 
-                    <i>You are a chameleon! Try and blend in</i>
-                  }
-                </div>
-                
-                {this.orderOfPlay()}
+            <div>
+              {this.state.character === "chameleon" && 
+                <i>You are a chameleon! Try and blend in</i>
+              }
+            </div>
+            {this.orderOfPlay()}
+            {this.votingComponent()}
 
-                {this.votingComponent()}
-                
-                <div className="InRoom-what_to_do">
-                  {this.whatToDo()}
-                </div>
-                
-                {this.state.showStartGameButton && (
-                  <div className="InRoom-start_new_game">
-                    <button onClick={this.startGame}>Start New Game</button>
-                  </div>
-                )}
-              </div>
-            )}
-            <div className="InRoom-leave">
-              <button onClick={this.leaveRoom}>Join a different room</button>
+            <div className="InRoom-what_to_do">
+              {this.whatToDo()}
             </div>
           </div>
         )}
       </div>
-    );
+    </div>
+  }
+
+  postGameComponent() {
+    return [
+      this.voteResultsComponent(),
+      this.leaderBoardComponent()
+    ]
+  }
+
+  headerComponent() {
+    return <div>
+      {this.state.roomOld && 
+        <div>Still playing? <a href={window.location} className="Chameleon-link">Refresh</a></div>
+      }
+      <div className="InRoom-room_code">
+        Room code: <span className="InRoom-room_code-code">{this.props.roomCode}</span>
+        <br />
+        Players: {this.state.numberOfPeopleInRoom}
+      </div>
+    </div>
+  }
+
+  footerComponent() {
+    return <div className="InRoom-footer">
+      {this.state.showStartGameButton && (
+        <div className="InRoom-start_new_game">
+          <button onClick={this.startGame}>Start New Game</button>
+        </div>
+      )}
+      <div className="InRoom-leave">
+        <button onClick={this.leaveRoom}>Join a different room</button>
+      </div>
+    </div>
+  }
+
+  render() {
+    if (this.state.roomState === null) {
+      return <div>Loading game...</div>
+    } else {
+      return [
+        this.headerComponent(),
+        this.state.everyoneVoted ? this.postGameComponent() : this.inGameComponent(),
+        this.footerComponent()
+      ]
+    }
   }
 }
 

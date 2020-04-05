@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection.Metadata;
 
 namespace DataStore
 {
@@ -119,7 +121,26 @@ namespace DataStore
         {
             var room = GetRoom(roomCode);
             room.SetVotedFor(personId, vote);
+            int numberLeftToVote = room.PersonIds
+                .Where(x => room.GetCharacterFor(x) != "chameleon")
+                .Count(x => room.GetVotedFor(x) == null);
+            if (numberLeftToVote == 0)
+            {
+                Score(room);
+            }
             Save(room);
+        }
+
+        
+        private void Score(Room room)
+        {
+            var myScorer = new Scorer(room);
+            Dictionary<string, int> scoreByPersonId = myScorer.CalculateScore();
+
+            foreach (var id in scoreByPersonId.Keys)
+            {
+                room.AddScore(id, scoreByPersonId[id]);
+            }
         }
     }
 }

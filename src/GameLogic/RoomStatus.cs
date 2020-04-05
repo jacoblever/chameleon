@@ -66,16 +66,18 @@ namespace GameLogic
 
         public class Person
         {
-            public Person(string id, string name, int votes)
+            public Person(string id, string name, int votes, int score)
             {
                 Id = id;
                 Name = name;
                 Votes = votes;
+                Score = score;
             }
 
             public string Id { get; }
             public string Name { get; }
             public int Votes { get; }
+            public int Score { get; }
         }
     }
 }
