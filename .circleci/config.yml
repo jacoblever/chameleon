@@ -158,7 +158,6 @@ workflows:
       - run_frontend_tests
       - deploy_backend_staging:
           requires:
-            - run_backend_tests
             - run_frontend_tests
           filters:
             branches:
@@ -181,7 +180,6 @@ workflows:
                 - master
       - deploy_frontend_staging:
           requires:
-            - run_backend_tests
             - run_frontend_tests
           filters:
             branches:
