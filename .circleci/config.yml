@@ -166,7 +166,6 @@ workflows:
                 - staging
       - deploy_backend_production:
           requires:
-            - run_backend_tests
             - run_frontend_tests
           filters:
             branches:
@@ -190,7 +189,6 @@ workflows:
                 - staging
       - deploy_frontend_production:
           requires:
-            - run_backend_tests
             - run_frontend_tests
           filters:
             branches:

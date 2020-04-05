@@ -59,7 +59,7 @@ namespace GameLogic
                 .Select(x =>
                 {
                     votesByPerson.TryGetValue(x, out var votes);
-                    return new RoomStatus.Person(x, room.GetNameFor(x), votes);
+                    return new RoomStatus.Person(x, room.GetNameFor(x), votes, room.GetScoreFor(x));
                 })
                 .ToList();
             var everyoneVoted = room.PersonIds.All(x => room.GetVotedFor(x) != null || room.GetCharacterFor(x) == "chameleon");
