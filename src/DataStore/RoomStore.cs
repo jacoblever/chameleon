@@ -131,38 +131,15 @@ namespace DataStore
             Save(room);
         }
 
+        
         private void Score(Room room)
         {
-            int numberOfPeople = room.PersonIds.Count;
-            int numberOfChameleons = room.PersonIds.Count(x => room.GetCharacterFor(x) == "chameleon");
-            
-            Dictionary<string, int> personByVoteCount = new Dictionary<string, int>();
-            foreach (var id in room.PersonIds)
+            var myScorer = new Scorer(room);
+            Dictionary<string, int> scoreByPersonId = myScorer.CalculateScore();
+
+            foreach (var id in scoreByPersonId.Keys)
             {
-                personByVoteCount[id] = room.PersonIds.Count(x => room.GetVotedFor(x) == id);
-            }
-            
-            int votesForChameleons = room.PersonIds
-                .Where(x => room.GetCharacterFor(x) == "chameleon")
-                .Sum(x => personByVoteCount[x]);
-            
-            foreach (var id in room.PersonIds)
-            {
-                int score;
-                if (room.GetCharacterFor(id) == "chameleon")
-                {
-                    score = numberOfPeople - numberOfChameleons - votesForChameleons;
-                    score += (int)Math.Round(((float)votesForChameleons / numberOfChameleons) - personByVoteCount[id]);
-                }
-                else
-                {
-                    score = votesForChameleons - personByVoteCount[id];
-                    if (room.GetCharacterFor(room.GetVotedFor(id)) == "chameleon")
-                    {
-                        score += 1;
-                    }
-                }
-                room.SetScore(id, score);
+                room.AddScore(id, scoreByPersonId[id]);
             }
         }
     }

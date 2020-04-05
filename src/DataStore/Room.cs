@@ -79,7 +79,7 @@ namespace DataStore
             _dynamoModel.PersonByPersonId[personId].Character = character;
         }
         
-        public void SetScore(string personId, int score)
+        public void AddScore(string personId, int score)
         {
             _dynamoModel.PersonByPersonId[personId].Score += score;
         }
